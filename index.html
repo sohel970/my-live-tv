@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sohel IPTV Pro</title>
     
-    <!-- Plyr Player CSS & Fonts -->
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -27,6 +25,7 @@
             box-sizing: border-box;
             font-family: 'Hind Siliguri', 'Poppins', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         body {
@@ -37,7 +36,7 @@
         }
 
         /* -----------------------------------------
-           PREMIUM VIDEO PLAYER WRAPPER (FIXED)
+           PREMIUM VIDEO PLAYER CONTAINER
         -------------------------------------------- */
         .player-container {
             max-width: 950px;
@@ -51,154 +50,146 @@
             width: 96%;
         }
 
-        /* 🚀 ফুলস্ক্রিন ল্যান্ডস্কেপে কেটে যাওয়া প্রতিরোধের ফিক্স */
         .player-container:fullscreen {
             width: 100vw !important;
             height: 100vh !important;
             max-width: 100vw !important;
             margin: 0 !important;
             border-radius: 0 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
             background: #000 !important;
         }
 
-        /* Top Header Navigation (🚀 আইকন হারিয়ে যাওয়া ফিক্স) */
-        .player-top-bar {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 25;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr; /* তিনটি অংশকে ফিক্সড জায়গা দেওয়া হলো */
-            align-items: center;
-            padding: 10px 15px;
-        }
-
-        .top-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 0; /* টেক্সট ট্রাঙ্কেশন সচল করতে */
-        }
-
-        .back-btn {
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .channel-logo-area {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 0;
-            width: 100%;
-        }
-
-        .channel-logo-area img {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #fff;
-            object-fit: contain;
-            flex-shrink: 0;
-        }
-
-        /* 🚀 নাম যত বড়ই হোক, আইকনকে ধাক্কা দেবে না */
-        .channel-title {
-            font-size: 14px;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; 
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-            color: #fff;
-        }
-
-        .server-container {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .srv-btn {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .srv-btn.active {
-            background: var(--accent-magenta);
-            border-color: var(--accent-magenta);
-        }
-
-        .top-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            font-size: 16px;
-            justify-content: flex-end;
-            flex-shrink: 0;
-        }
-
-        .top-right i {
-            cursor: pointer;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-            padding: 4px;
-        }
-
-        /* Video Box Screen layout */
+        /* Main Screen Layout */
         .main-screen {
             display: flex;
             width: 100%;
             aspect-ratio: 16 / 9;
             position: relative;
             background: #000;
+            overflow: hidden;
         }
 
         .player-container:fullscreen .main-screen {
-            flex: 1 !important;
-            height: 100% !important;
-            aspect-ratio: auto !important; /* ফুলস্ক্রিনে বাউণ্ডারি রিমুভ */
+            height: 100vh !important;
+            aspect-ratio: auto !important;
         }
 
+        /* 🚀 ১ নম্বর ফিক্স: বামে কালো জায়গা দূর করা এবং ১০০% স্ট্রেচ ফিক্স */
         .video-render-box {
             width: 100%;
             height: 100%;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* 🚀 Aspect Ratio ফিক্সড করার স্ট্যান্ডার্ড মেথড */
         .video-render-box video {
-            width: 100% !important;
-            height: 100% !important;
-            display: block !important;
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         .fit-mode video { object-fit: contain !important; }
-        .stretch-mode video { object-fit: fill !important; }
+        .stretch-mode video { object-fit: fill !important; width: 100vw !important; height: 100vh !important; }
 
-        /* Plyr এর ডিফল্ট অবজেক্ট ফিট ওভাররাইড */
-        .fit-mode .plyr__video-wrapper video { object-fit: contain !important; }
-        .stretch-mode .plyr__video-wrapper video { object-fit: fill !important; }
+        /* 🚀 ২ নম্বর ফিচার: ওয়ান-টাচ অটো হাইড কন্ট্রোল প্যানেল */
+        .player-controls-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none; /* যাতে জেস্টার সোয়াইপে বাধা না দেয় */
+            transition: opacity 0.4s ease;
+            opacity: 1;
+        }
 
-        /* -----------------------------------------
-           SETTINGS OVERLAY PANEL (⚙️ Menu)
-        -------------------------------------------- */
+        .player-controls-layer.hidden {
+            opacity: 0;
+            cursor: none;
+        }
+
+        /* টপ এবং বটম বার একটিভেশন */
+        .player-top-bar, .player-bottom-bar {
+            pointer-events: auto; /* কন্ট্রোলের ভেতরে ক্লিক সচল রাখা */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+            padding: 12px 15px;
+        }
+        
+        .player-bottom-bar {
+            background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Top Bar Sub-layouts */
+        .player-top-bar {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            align-items: center;
+        }
+
+        .top-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .back-btn { background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+        .channel-logo-area { display: flex; align-items: center; gap: 8px; min-width: 0; width: 100%; }
+        .channel-logo-area img { width: 28px; height: 28px; border-radius: 50%; background: #fff; object-fit: contain; flex-shrink: 0; }
+        .channel-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
+
+        .server-container { display: flex; gap: 5px; justify-content: center; }
+        .srv-btn { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 4px 8px; border-radius: 15px; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .srv-btn.active { background: var(--accent-magenta); border-color: var(--accent-magenta); }
+
+        .top-right { display: flex; align-items: center; gap: 14px; font-size: 16px; justify-content: flex-end; }
+        .top-right i { cursor: pointer; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); padding: 4px; }
+
+        /* Bottom Play/Pause & Progress */
+        .play-btn { background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+        .progress-container { flex: 1; display: flex; align-items: center; }
+        .live-badge { background: red; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* 🚀 ৩ নম্বর ফিচার: ব্রাইটনেস ও ভলিউম জেস্টার ইন্ডিকেটর ও থিম */
+        .gesture-detector-box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+        }
+        .gesture-side {
+            width: 50%;
+            height: 100%;
+        }
+
+        /* অন-স্ক্রিন ওএসডি (OSD) নোটিফিকেশন */
+        .gesture-osd {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 25;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        #brightnessOSD { left: 40px; border-left: 3px solid #ffb300; }
+        #volumeOSD { right: 40px; border-right: 3px solid #00b0ff; }
+
+        /* Settings Gear Overlay */
         .settings-overlay {
             position: absolute;
             top: 45px;
@@ -213,110 +204,41 @@
             display: none; 
         }
 
-        .menu-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 13px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; cursor: pointer; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .menu-item:last-child { border-bottom: none; }
         .menu-left { display: flex; align-items: center; gap: 10px; color: #e2e8f0; }
         .menu-left i { width: 16px; text-align: center; }
         .menu-right { color: #94a3b8; display: flex; align-items: center; gap: 5px; }
-
-        .quality-select-inline {
-            background: transparent;
-            color: #fff;
-            border: none;
-            outline: none;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: right;
-        }
+        .quality-select-inline { background: transparent; color: #fff; border: none; outline: none; font-size: 12px; font-weight: 600; cursor: pointer; }
         .quality-select-inline option { background: #151b26; }
 
         /* Floating Grip Button */
-        .floating-grid-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: var(--accent-magenta);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
-            border: none;
-            z-index: 999;
-        }
+        .floating-grid-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent-magenta); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4); border: none; z-index: 999; }
 
-        /* Landing Channel Grid UI */
-        .landing-header {
-            background: var(--panel-bg);
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border-bottom: 2px solid var(--accent-magenta);
-        }
-
-        .search-box input {
-            background: #1c2331;
-            border: 1px solid #2e3b52;
-            padding: 8px 15px;
-            border-radius: 20px;
-            color: white;
-            outline: none;
-            width: 100%;
-            font-size: 14px;
-        }
-
+        /* UI Channels View grid */
+        .landing-header { background: var(--panel-bg); padding: 15px; display: flex; flex-direction: column; gap: 10px; border-bottom: 2px solid var(--accent-magenta); }
+        .landing-header h2 { font-size: 20px; }
+        .search-box input { background: #1c2331; border: 1px solid #2e3b52; padding: 8px 15px; border-radius: 20px; color: white; outline: none; width: 100%; font-size: 14px; }
         .grid-section { padding: 15px; max-width: 950px; margin: 0 auto; }
         .section-title { font-size: 16px; margin-bottom: 15px; border-left: 4px solid var(--accent-magenta); padding-left: 8px; }
         .channels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-        
-        .channel-card {
-            background: var(--panel-bg);
-            border: 1px solid #1e293b;
-            border-radius: 10px;
-            padding: 12px 6px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .logo-wrap {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            margin: 0 auto 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-        }
-
+        .channel-card { background: var(--panel-bg); border: 1px solid #1e293b; border-radius: 10px; padding: 12px 6px; text-align: center; cursor: pointer; }
+        .logo-wrap { width: 50px; height: 50px; background: white; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; padding: 4px; }
         .logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .card-name { font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Plyr Fixes */
-        .plyr { height: 100% !important; width: 100% !important; }
-        .plyr__video-wrapper { height: 100% !important; width: 100% !important; }
+        /* ফুলস্ক্রিন ব্রাইটনেস ফিল্টার ওভারলে */
+        .brightness-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0);
+            pointer-events: none;
+            z-index: 5;
+        }
     </style>
 </head>
 <body>
 
-    <!-- App Top Bar Header -->
     <div class="landing-header">
         <h2>Sohel IPTV Pro</h2>
         <div class="search-box">
@@ -324,107 +246,215 @@
         </div>
     </div>
 
-    <!-- Floating Grid Menu Button -->
     <button class="floating-grid-btn" onclick="scrollToGrid()">
         <i class="fa-solid fa-grip"></i>
     </button>
 
-    <!-- Core Main Player Window -->
     <div class="player-container" id="playerContainer">
         
-        <!-- Top Overlay Navbar Controls -->
-        <div class="player-top-bar">
-            <div class="top-left">
-                <button class="back-btn" onclick="closePlayer()"><i class="fa-solid fa-chevron-left"></i></button>
-                <div class="channel-logo-area">
-                    <img id="playerLogo" src="" alt="">
-                    <span class="channel-title" id="playerTitle">Loading...</span>
-                </div>
-            </div>
-            
-            <div class="server-container">
-                <button class="srv-btn active" onclick="switchServer(1)">Server 1</button>
-                <button class="srv-btn" onclick="switchServer(2)">Server 2</button>
-                <button class="srv-btn" onclick="switchServer(3)">Server 3</button>
+        <div class="main-screen" id="mainScreenBox">
+            <div class="brightness-overlay" id="brightLayer"></div>
+
+            <div class="gesture-detector-box" id="gestureBox">
+                <div class="gesture-side" id="leftSideBright"></div>
+                <div class="gesture-side" id="rightSideVol"></div>
             </div>
 
-            <div class="top-right">
-                <i class="fa-solid fa-rotate" onclick="refreshStream()"></i>
-                <i class="fa-solid fa-gear" onclick="toggleSettingsOverlay()"></i>
-                <i class="fa-solid fa-expand" onclick="toggleFullscreen()"></i>
-            </div>
-        </div>
+            <div class="gesture-osd" id="brightnessOSD"><i class="fa-solid fa-sun"></i> <span id="brightText">100%</span></div>
+            <div class="gesture-osd" id="volumeOSD"><i class="fa-solid fa-volume-high"></i> <span id="volText">100%</span></div>
 
-        <!-- Video Rendering Content Area -->
-        <div class="main-screen">
             <div class="video-render-box fit-mode" id="videoWrapper">
                 <video id="mainVideoPlayer" playsinline></video>
             </div>
-        </div>
 
-        <!-- Settings Modal (⚙️ Gear List Options) -->
-        <div class="settings-overlay" id="settingsMenu">
-            <!-- Quality Area -->
-            <div class="menu-item">
-                <div class="menu-left">
-                    <i class="fa-solid fa-sliders"></i>
-                    <span>Quality</span>
+            <div class="player-controls-layer" id="controlsLayer">
+                <div class="player-top-bar">
+                    <div class="top-left">
+                        <button class="back-btn" onclick="closePlayer()"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div class="channel-logo-area">
+                            <img id="playerLogo" src="" alt="">
+                            <span class="channel-title" id="playerTitle">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="server-container">
+                        <button class="srv-btn active" onclick="switchServer(1)">Server 1</button>
+                        <button class="srv-btn" onclick="switchServer(2)">Server 2</button>
+                        <button class="srv-btn" onclick="switchServer(3)">Server 3</button>
+                    </div>
+                    <div class="top-right">
+                        <i class="fa-solid fa-rotate" onclick="refreshStream()"></i>
+                        <i class="fa-solid fa-gear" onclick="toggleSettingsOverlay()"></i>
+                        <i class="fa-solid fa-expand" onclick="toggleFullscreen()"></i>
+                    </div>
                 </div>
-                <div class="menu-right">
-                    <select id="hlsQualitySelect" class="quality-select-inline" onchange="changeResolution(this.value)">
-                        <option value="-1">Auto (ডিফল্ট)</option>
-                        <option value="1080">1080p (HD)</option>
-                        <option value="1440">1440p (2K)</option>
-                        <option value="2160">2160p (4K)</option>
-                    </select>
-                    <i class="fa-solid fa-chevron-right"></i>
+
+                <div class="player-bottom-bar">
+                    <button class="play-btn" id="customPlayBtn" onclick="togglePlayPause()"><i class="fa-solid fa-pause"></i></button>
+                    <div class="progress-container">
+                        <span class="live-badge">● LIVE STREAM</span>
+                    </div>
                 </div>
             </div>
-            <!-- Aspect Ratio Controller -->
-            <div class="menu-item" onclick="changeAspectRatio()">
-                <div class="menu-left">
-                    <i class="fa-solid fa-vector-square"></i>
-                    <span>Aspect Ratio</span>
+
+            <div class="settings-overlay" id="settingsMenu">
+                <div class="menu-item">
+                    <div class="menu-left"><i class="fa-solid fa-sliders"></i><span>Quality</span></div>
+                    <div class="menu-right">
+                        <select id="hlsQualitySelect" class="quality-select-inline" onchange="changeResolution(this.value)">
+                            <option value="-1">Auto (ডিফল্ট)</option>
+                            <option value="1080">1080p (HD)</option>
+                            <option value="1440">1440p (2K)</option>
+                            <option value="2160">2160p (4K)</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
                 </div>
-                <div class="menu-right">
-                    <span id="ratioLabel">Fit</span>
+                <div class="menu-item" onclick="changeAspectRatio()">
+                    <div class="menu-left"><i class="fa-solid fa-vector-square"></i><span>Aspect Ratio</span></div>
+                    <div class="menu-right"><span id="ratioLabel">Fit</span></div>
+                </div>
+                <div class="menu-item" onclick="activatePiP()">
+                    <div class="menu-left"><i class="fa-solid fa-window-restore"></i><span>PiP</span></div>
+                    <div class="menu-right"></div>
                 </div>
             </div>
-            <!-- Picture In Picture Mode -->
-            <div class="menu-item" onclick="activatePiP()">
-                <div class="menu-left">
-                    <i class="fa-solid fa-window-restore"></i>
-                    <span>PiP</span>
-                </div>
-                <div class="menu-right"></div>
-            </div>
+
         </div>
     </div>
 
-    <!-- Channels Render Container Section -->
     <div class="grid-section" id="listSection">
         <h3 class="section-title">সব চ্যানেলসমূহ</h3>
         <div class="channels-grid" id="uiChannelsGrid"></div>
     </div>
 
-    <!-- Core Script Assets Integration Modules -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
     <script>
         const playlistM3uUrl = "https://raw.githubusercontent.com/imShakil/tvlink/refs/heads/main/iptv.m3u8";
         let parsedChannels = [];
         let activeSelectedChannel = null;
-        let plyrEngine = null;
         let hlsInstance = null;
+        const videoElement = document.getElementById('mainVideoPlayer');
+
+        // অটো হাইড টাইমার ভ্যারিয়েবল
+        let controlsTimer = null;
+        let isPanelActive = true;
+
+        // জেস্টার লজিক ভ্যারিয়েবলস
+        let startY = 0;
+        let startVol = 1;
+        let startBright = 100;
+        let currentVolume = 1; // Default Max
+        let currentBrightness = 100; // Default Max
 
         document.addEventListener('DOMContentLoaded', () => {
-            plyrEngine = new Plyr('#mainVideoPlayer', {
-                controls: ['play', 'progress', 'current-time', 'mute', 'volume']
-            });
             fetchPlaylist();
+            setupGestureListeners();
+            setupPanelAutoHideTrigger();
         });
 
+        // 🚀 ২ নম্বর ফিচার: প্যানেল ক্লিক ও টাচ করলে আসা এবং ১০ সেকেন্ড পর অটো হাইড হওয়া
+        function setupPanelAutoHideTrigger() {
+            // প্লেয়ার স্ক্রিনে ক্লিক করলে টগল হবে
+            document.getElementById('gestureBox').addEventListener('click', () => {
+                if (!isPanelActive) {
+                    showControlPanel();
+                } else {
+                    hideControlPanel();
+                }
+            });
+
+            // যেকোনো বাটন বা অ্যাকশনে টাচ পড়লে টাইমার রিসেট হবে
+            document.getElementById('playerContainer').addEventListener('touchstart', resetAutoHideTimer);
+            document.getElementById('playerContainer').addEventListener('mousemove', resetAutoHideTimer);
+            
+            showControlPanel(); // শুরুতে শো করবে
+        }
+
+        function showControlPanel() {
+            document.getElementById('controlsLayer').classList.remove('hidden');
+            isPanelActive = true;
+            resetAutoHideTimer();
+        }
+
+        function hideControlPanel() {
+            document.getElementById('controlsLayer').classList.add('hidden');
+            document.getElementById('settingsMenu').style.display = 'none'; // সেটিংস প্যানেল খোলা থাকলে তাও হাইড হবে
+            isPanelActive = false;
+        }
+
+        function resetAutoHideTimer() {
+            clearTimeout(controlsTimer);
+            if (isPanelActive) {
+                controlsTimer = setTimeout(() => {
+                    hideControlPanel();
+                }, 10000); // 🚀 ১০ সেকেন্ড পর হাইড হবে
+            }
+        }
+
+        // 🚀 ৩ নম্বর ফিচার: সোয়াইপ করে ব্রাইটনেস ও ভলিউম নিয়ন্ত্রণ (Gesture Engine)
+        function setupGestureListeners() {
+            const leftSide = document.getElementById('leftSideBright');
+            const rightSide = document.getElementById('rightSideVol');
+
+            // --- বাম পাশে ব্রাইটনেস কন্ট্রোল ---
+            leftSide.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                startBright = currentBrightness;
+                document.getElementById('brightnessOSD').style.opacity = '1';
+            });
+
+            leftSide.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                let deltaY = startY - e.touches[0].clientY;
+                let change = Math.round((deltaY / window.innerHeight) * 200); // সেন্সিটিভিটি টিউনিং
+                let newBright = Math.min(100, Math.max(10, startBright + change));
+                
+                currentBrightness = newBright;
+                // ব্রাইটনেস ফিল্টার মডিউল (কালো ব্যাকগ্রাউন্ড অপাসিটি দিয়ে ব্রাইটনেস কমানো)
+                let alpha = (100 - newBright) / 100;
+                document.getElementById('brightLayer').style.background = `rgba(0, 0, 0, ${alpha * 0.8})`; 
+                
+                document.getElementById('brightText').innerText = newBright + '%';
+                resetAutoHideTimer();
+            });
+
+            leftSide.addEventListener('touchend', () => {
+                setTimeout(() => document.getElementById('brightnessOSD').style.opacity = '0', 800);
+            });
+
+            // --- ডান পাশে ভলিউম কন্ট্রোল ---
+            rightSide.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                startVol = videoElement.volume;
+                document.getElementById('volumeOSD').style.opacity = '1';
+            });
+
+            rightSide.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                let deltaY = startY - e.touches[0].clientY;
+                let change = deltaY / window.innerHeight * 1.5;
+                let newVol = Math.min(1, Math.max(0, startVol + change));
+                
+                videoElement.volume = newVol;
+                let volPercent = Math.round(newVol * 100);
+                
+                // আইকন পরিবর্তন লজিক
+                const volIcon = document.querySelector('#volumeOSD i');
+                if(volPercent === 0) volIcon.className = "fa-solid fa-volume-xmark";
+                else if(volPercent < 50) volIcon.className = "fa-solid fa-volume-low";
+                else volIcon.className = "fa-solid fa-volume-high";
+
+                document.getElementById('volText').innerText = volPercent + '%';
+                resetAutoHideTimer();
+            });
+
+            rightSide.addEventListener('touchend', () => {
+                setTimeout(() => document.getElementById('volumeOSD').style.opacity = '0', 800);
+            });
+        }
+
+        // Fetch & Parse M3U
         async function fetchPlaylist() {
             try {
                 const res = await fetch(playlistM3uUrl);
@@ -478,12 +508,11 @@
             
             window.scrollTo({top: document.getElementById('playerContainer').offsetTop - 10, behavior: 'smooth'});
             loadStreamSource(channel.url);
+            showControlPanel();
         }
 
         function loadStreamSource(url) {
-            const videoElement = document.getElementById('mainVideoPlayer');
             const qualSelect = document.getElementById('hlsQualitySelect');
-
             if(hlsInstance) hlsInstance.destroy();
 
             if(Hls.isSupported()) {
@@ -506,17 +535,42 @@
                             }
                         });
                     }
-                    videoElement.play().catch(e => console.log("Autoplay issue"));
+                    videoElement.play().catch(e => console.log("Autoplay caught"));
+                    updatePlayButtonIcon(true);
                 });
             } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
                 videoElement.src = url;
-                videoElement.addEventListener('loadedmetadata', () => videoElement.play());
+                videoElement.addEventListener('loadedmetadata', () => {
+                    videoElement.play();
+                    updatePlayButtonIcon(true);
+                });
+            }
+        }
+
+        function togglePlayPause() {
+            if (videoElement.paused) {
+                videoElement.play();
+                updatePlayButtonIcon(true);
+            } else {
+                videoElement.pause();
+                updatePlayButtonIcon(false);
+            }
+            resetAutoHideTimer();
+        }
+
+        function updatePlayButtonIcon(isPlaying) {
+            const icon = document.querySelector('#customPlayBtn i');
+            if (isPlaying) {
+                icon.className = "fa-solid fa-pause";
+            } else {
+                icon.className = "fa-solid fa-play";
             }
         }
 
         function toggleSettingsOverlay() {
             const menu = document.getElementById('settingsMenu');
             menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+            resetAutoHideTimer();
         }
 
         function changeResolution(val) {
@@ -530,7 +584,7 @@
             toggleSettingsOverlay();
         }
 
-        // 🚀 Aspect Ratio ফিক্স লজিক (যা Plyr ক্লাসের ভেতরেও কাজ করবে)
+        // 🚀 ১ নম্বর ফিক্স: রিয়েল ১০০% স্ট্রেচ রেশিও প্রয়োগ করা (বামের কালো জায়গা ফিক্সড)
         function changeAspectRatio() {
             const wrap = document.getElementById('videoWrapper');
             const label = document.getElementById('ratioLabel');
@@ -547,41 +601,32 @@
         }
 
         async function activatePiP() {
-            const video = document.getElementById('mainVideoPlayer');
             try {
                 if(document.pictureInPictureElement) {
                     await document.exitPictureInPicture();
                 } else {
-                    await video.requestPictureInPicture();
+                    await videoElement.requestPictureInPicture();
                 }
             } catch(e) { console.log(e); }
             toggleSettingsOverlay();
         }
 
-        // 🚀 ফুলস্ক্রিন ও ওরিয়েন্টেশন ফিক্স মেকানিজম
         async function toggleFullscreen() {
             const container = document.getElementById('playerContainer');
             try {
                 if (!document.fullscreenElement) {
-                    if (container.requestFullscreen) {
-                        await container.requestFullscreen();
-                    } else if (container.webkitRequestFullscreen) {
-                        await container.webkitRequestFullscreen();
-                    }
+                    if (container.requestFullscreen) { await container.requestFullscreen(); }
+                    else if (container.webkitRequestFullscreen) { await container.webkitRequestFullscreen(); }
+                    
                     if (screen.orientation && screen.orientation.lock) {
-                        await screen.orientation.lock('landscape').catch(e => console.log("Orientation lock restricted"));
+                        await screen.orientation.lock('landscape').catch(e => console.log("Orientation lock restriction"));
                     }
                 } else {
-                    if (document.exitFullscreen) {
-                        await document.exitFullscreen();
-                    }
-                    if (screen.orientation && screen.orientation.unlock) {
-                        screen.orientation.unlock();
-                    }
+                    if (document.exitFullscreen) { await document.exitFullscreen(); }
+                    if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
                 }
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
+            resetAutoHideTimer();
         }
 
         function switchServer(srvNum) {
@@ -592,15 +637,18 @@
             let targetUrl = activeSelectedChannel.url;
             let sep = targetUrl.includes('?') ? '&' : '?';
             loadStreamSource(targetUrl + sep + "server=" + srvNum + "&ts=" + Date.now());
+            resetAutoHideTimer();
         }
 
         function refreshStream() {
             if(activeSelectedChannel) loadStreamSource(activeSelectedChannel.url);
+            resetAutoHideTimer();
         }
 
         function closePlayer() {
             if(hlsInstance) hlsInstance.destroy();
             document.getElementById('playerContainer').style.display = 'none';
+            clearTimeout(controlsTimer);
         }
 
         function scrollToGrid() {
