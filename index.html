@@ -7,16 +7,17 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500;700&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-dark: #06090e;
-            --panel-bg: #0d1117;
-            --accent-magenta: #e91e63;
+            --bg-dark: #000000; 
+            --panel-bg: #0d0d0d;
+            --accent-magenta: #ff2a74; 
+            --card-bg: #0c0c0e;
             --text-light: #ffffff;
-            --overlay-bg: rgba(13, 17, 23, 0.95);
+            --overlay-bg: rgba(5, 5, 5, 0.98);
         }
 
         * {
@@ -32,22 +33,24 @@
             background-color: var(--bg-dark);
             color: var(--text-light);
             overflow-x: hidden;
-            padding-bottom: 80px;
+            padding-bottom: 30px;
+            min-height: 100vh;
         }
 
         /* -----------------------------------------
-           PREMIUM VIDEO PLAYER CONTAINER
+           VIDEO PLAYER CONTAINER & LAX LOADER
         -------------------------------------------- */
         .player-container {
             max-width: 950px;
             margin: 10px auto;
             background: #000;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 42, 116, 0.2);
             position: relative;
             display: none; 
-            width: 96%;
+            width: 95%;
+            border: 1px solid rgba(255, 42, 116, 0.25);
         }
 
         .player-container:fullscreen {
@@ -56,10 +59,9 @@
             max-width: 100vw !important;
             margin: 0 !important;
             border-radius: 0 !important;
-            background: #000 !important;
+            border: none;
         }
 
-        /* Main Screen Layout */
         .main-screen {
             display: flex;
             width: 100%;
@@ -74,11 +76,9 @@
             aspect-ratio: auto !important;
         }
 
-        /* 🚀 ১ নম্বর ফিক্স: বামে কালো জায়গা দূর করা এবং ১০০% স্ট্রেচ ফিক্স */
         .video-render-box {
             width: 100%;
             height: 100%;
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -93,18 +93,53 @@
         .fit-mode video { object-fit: contain !important; }
         .stretch-mode video { object-fit: fill !important; width: 100vw !important; height: 100vh !important; }
 
-        /* 🚀 ২ নম্বর ফিচার: ওয়ান-টাচ অটো হাইড কন্ট্রোল প্যানেল */
+        /* 🔄 প্রিমিয়াম গ্লোয়িং লোডার স্টাইল */
+        .premium-loader-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 20;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .spinner-ring {
+            width: 45px;
+            height: 45px;
+            border: 3.5px solid rgba(255, 42, 116, 0.15);
+            border-top-color: var(--accent-magenta);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            box-shadow: 0 0 12px rgba(255, 42, 116, 0.2);
+        }
+
+        .loader-text {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Controls Layer */
         .player-controls-layer {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 15;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            pointer-events: none; /* যাতে জেস্টার সোয়াইপে বাধা না দেয় */
+            pointer-events: none;
             transition: opacity 0.4s ease;
             opacity: 1;
         }
@@ -114,9 +149,8 @@
             cursor: none;
         }
 
-        /* টপ এবং বটম বার একটিভেশন */
         .player-top-bar, .player-bottom-bar {
-            pointer-events: auto; /* কন্ট্রোলের ভেতরে ক্লিক সচল রাখা */
+            pointer-events: auto;
             background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
             padding: 12px 15px;
         }
@@ -128,106 +162,236 @@
             gap: 15px;
         }
 
-        /* Top Bar Sub-layouts */
         .player-top-bar {
             display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr;
+            grid-template-columns: 1.3fr 1fr 1fr;
             align-items: center;
         }
 
         .top-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
         .back-btn { background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; }
-        .channel-logo-area { display: flex; align-items: center; gap: 8px; min-width: 0; width: 100%; }
-        .channel-logo-area img { width: 28px; height: 28px; border-radius: 50%; background: #fff; object-fit: contain; flex-shrink: 0; }
-        .channel-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
+        .channel-logo-area { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .channel-logo-area img { width: 30px; height: 30px; border-radius: 50%; background: #fff; object-fit: contain; }
+        .channel-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .server-container { display: flex; gap: 5px; justify-content: center; }
-        .srv-btn { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 4px 8px; border-radius: 15px; font-size: 10px; font-weight: 600; cursor: pointer; }
-        .srv-btn.active { background: var(--accent-magenta); border-color: var(--accent-magenta); }
+        .srv-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 4px 10px; border-radius: 15px; font-size: 10px; font-weight: 700; cursor: pointer; }
+        .srv-btn.active { background: var(--accent-magenta); border-color: var(--accent-magenta); box-shadow: 0 0 10px rgba(255, 42, 116, 0.4); }
 
         .top-right { display: flex; align-items: center; gap: 14px; font-size: 16px; justify-content: flex-end; }
-        .top-right i { cursor: pointer; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); padding: 4px; }
+        .top-right i { cursor: pointer; padding: 4px; }
 
-        /* Bottom Play/Pause & Progress */
         .play-btn { background: transparent; border: none; color: #fff; font-size: 18px; cursor: pointer; }
         .progress-container { flex: 1; display: flex; align-items: center; }
-        .live-badge { background: red; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .live-badge { background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; }
 
-        /* 🚀 ৩ নম্বর ফিচার: ব্রাইটনেস ও ভলিউম জেস্টার ইন্ডিকেটর ও থিম */
+        /* Gesture Tracker */
         .gesture-detector-box {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10;
             display: flex;
         }
-        .gesture-side {
-            width: 50%;
-            height: 100%;
-        }
+        .gesture-side { width: 50%; height: 100%; }
 
-        /* অন-স্ক্রিন ওএসডি (OSD) নোটিফিকেশন */
+        /* OSD Configuration */
         .gesture-osd {
             position: absolute;
             top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.75);
+            transform: translateY(-50%) scale(0.85);
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
             color: #fff;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 14px;
+            width: 45px;
+            height: 160px;
+            border-radius: 25px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            padding: 12px 0;
             z-index: 25;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        #brightnessOSD { left: 40px; border-left: 3px solid #ffb300; }
-        #volumeOSD { right: 40px; border-right: 3px solid #00b0ff; }
+        .gesture-osd.active { opacity: 1; transform: translateY(-50%) scale(1); }
+        .osd-track { width: 5px; height: 90px; background: rgba(255,255,255,0.15); border-radius: 3px; position: relative; overflow: hidden; }
+        .osd-fill { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; border-radius: 3px; }
+        #brightnessOSD .osd-fill { background: linear-gradient(to top, #ff9100, #ffea00); }
+        #volumeOSD .osd-fill { background: linear-gradient(to top, #0072ff, #00c6ff); }
+        .gesture-osd i { font-size: 14px; }
+        .osd-val-text { font-size: 10px; font-weight: 700; }
 
-        /* Settings Gear Overlay */
+        #brightnessOSD { left: 20px; }
+        #volumeOSD { right: 20px; }
+
+        /* Settings System */
         .settings-overlay {
             position: absolute;
-            top: 45px;
-            right: 15px;
-            width: 230px;
+            top: 50px; right: 15px;
+            width: 220px;
             background: var(--overlay-bg);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 4px 0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
             z-index: 40;
             display: none; 
         }
 
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; cursor: pointer; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .menu-item:last-child { border-bottom: none; }
-        .menu-left { display: flex; align-items: center; gap: 10px; color: #e2e8f0; }
-        .menu-left i { width: 16px; text-align: center; }
+        .menu-left { display: flex; align-items: center; gap: 10px; }
+        .menu-left i { width: 16px; text-align: center; color: var(--accent-magenta); }
         .menu-right { color: #94a3b8; display: flex; align-items: center; gap: 5px; }
         .quality-select-inline { background: transparent; color: #fff; border: none; outline: none; font-size: 12px; font-weight: 600; cursor: pointer; }
-        .quality-select-inline option { background: #151b26; }
+        .quality-select-inline option { background: #000; }
 
-        /* Floating Grip Button */
-        .floating-grid-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--accent-magenta); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4); border: none; z-index: 999; }
+        /* -----------------------------------------
+           🚀 অ্যাডভান্সড ৩-কলাম গ্রিড ও লাক্সারি থিম
+        -------------------------------------------- */
+        .landing-header {
+            background: #000000;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: center;
+        }
 
-        /* UI Channels View grid */
-        .landing-header { background: var(--panel-bg); padding: 15px; display: flex; flex-direction: column; gap: 10px; border-bottom: 2px solid var(--accent-magenta); }
-        .landing-header h2 { font-size: 20px; }
-        .search-box input { background: #1c2331; border: 1px solid #2e3b52; padding: 8px 15px; border-radius: 20px; color: white; outline: none; width: 100%; font-size: 14px; }
-        .grid-section { padding: 15px; max-width: 950px; margin: 0 auto; }
-        .section-title { font-size: 16px; margin-bottom: 15px; border-left: 4px solid var(--accent-magenta); padding-left: 8px; }
-        .channels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-        .channel-card { background: var(--panel-bg); border: 1px solid #1e293b; border-radius: 10px; padding: 12px 6px; text-align: center; cursor: pointer; }
-        .logo-wrap { width: 50px; height: 50px; background: white; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; padding: 4px; }
-        .logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .card-name { font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .landing-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--accent-magenta);
+            text-shadow: 0 0 10px rgba(255, 42, 116, 0.3);
+        }
 
-        /* ফুলস্ক্রিন ব্রাইটনেস ফিল্টার ওভারলে */
+        .search-box {
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .search-box input {
+            background: #0f0f12;
+            border: 1px solid #1f1f24;
+            padding: 12px 20px;
+            border-radius: 25px;
+            color: white;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent-magenta);
+            box-shadow: 0 0 12px rgba(255, 42, 116, 0.25);
+        }
+
+        .grid-section {
+            padding: 15px 12px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffffff;
+        }
+        
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 15px;
+            background: var(--accent-magenta);
+            border-radius: 2px;
+        }
+
+        /* ৩-কলাম ফিক্সড গ্রিড স্ট্রাকচার (ডানপাশের ব্ল্যাক বক্স ফিক্সড) */
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 12px; 
+            width: 100%;
+        }
+
+        /* রেসপনসিভ লার্জ স্ক্রিন লেআউট */
+        @media (min-width: 600px) { .channels-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 14px; } }
+        @media (min-width: 900px) { .channels-grid { grid-template-columns: repeat(6, 1fr) !important; gap: 16px; } }
+
+        /* 🚀 অবিকল স্ক্রিনশটের মতো প্রিমিয়াম ম্যাজেন্টা নিয়োন বর্ডারলাইন কার্ড */
+        .channel-card {
+            background: #000000;
+            border: 2px solid var(--accent-magenta); /* অলওয়েজ প্রিমিয়াম পিঙ্ক বর্ডার */
+            border-radius: 22px; 
+            padding: 16px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(255, 42, 116, 0.05);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .channel-card:active {
+            box-shadow: 0 0 15px rgba(255, 42, 116, 0.4);
+            transform: scale(0.95);
+        }
+
+        .logo-wrap {
+            width: 60px;
+            height: 60px;
+            background: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+        }
+
+        .logo-wrap img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* 🚀 ছোট স্ক্রিনে লেখা স্বয়ংক্রিয়ভাবে ছোট করার ফিক্স */
+        .card-name {
+            font-size: 10px; /* মোবাইল স্ক্রিনের জন্য নিখুঁত টাইটেল সাইজ */
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+
+        /* ট্যাবলেট বা ডেস্কটপে ফন্ট সাইজ সামান্য ইনক্রিজ হবে */
+        @media (min-width: 600px) {
+            .card-name { font-size: 12px; }
+            .logo-wrap { width: 68px; height: 68px; }
+        }
+
         .brightness-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -246,22 +410,31 @@
         </div>
     </div>
 
-    <button class="floating-grid-btn" onclick="scrollToGrid()">
-        <i class="fa-solid fa-grip"></i>
-    </button>
-
     <div class="player-container" id="playerContainer">
-        
         <div class="main-screen" id="mainScreenBox">
             <div class="brightness-overlay" id="brightLayer"></div>
+
+            <div class="premium-loader-layer" id="streamLoader">
+                <div class="spinner-ring"></div>
+                <div class="loader-text">Loading Stream...</div>
+            </div>
 
             <div class="gesture-detector-box" id="gestureBox">
                 <div class="gesture-side" id="leftSideBright"></div>
                 <div class="gesture-side" id="rightSideVol"></div>
             </div>
 
-            <div class="gesture-osd" id="brightnessOSD"><i class="fa-solid fa-sun"></i> <span id="brightText">100%</span></div>
-            <div class="gesture-osd" id="volumeOSD"><i class="fa-solid fa-volume-high"></i> <span id="volText">100%</span></div>
+            <div class="gesture-osd" id="brightnessOSD">
+                <span class="osd-val-text" id="brightText">100%</span>
+                <div class="osd-track"><div class="osd-fill" id="brightFill"></div></div>
+                <i class="fa-solid fa-sun"></i>
+            </div>
+            
+            <div class="gesture-osd" id="volumeOSD">
+                <span class="osd-val-text" id="volText">100%</span>
+                <div class="osd-track"><div class="osd-fill" id="volFill"></div></div>
+                <i class="fa-solid fa-volume-high"></i>
+            </div>
 
             <div class="video-render-box fit-mode" id="videoWrapper">
                 <video id="mainVideoPlayer" playsinline></video>
@@ -291,7 +464,7 @@
                 <div class="player-bottom-bar">
                     <button class="play-btn" id="customPlayBtn" onclick="togglePlayPause()"><i class="fa-solid fa-pause"></i></button>
                     <div class="progress-container">
-                        <span class="live-badge">● LIVE STREAM</span>
+                        <span class="live-badge">● LIVE</span>
                     </div>
                 </div>
             </div>
@@ -302,9 +475,6 @@
                     <div class="menu-right">
                         <select id="hlsQualitySelect" class="quality-select-inline" onchange="changeResolution(this.value)">
                             <option value="-1">Auto (ডিফল্ট)</option>
-                            <option value="1080">1080p (HD)</option>
-                            <option value="1440">1440p (2K)</option>
-                            <option value="2160">2160p (4K)</option>
                         </select>
                         <i class="fa-solid fa-chevron-right"></i>
                     </div>
@@ -318,7 +488,6 @@
                     <div class="menu-right"></div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -335,40 +504,34 @@
         let activeSelectedChannel = null;
         let hlsInstance = null;
         const videoElement = document.getElementById('mainVideoPlayer');
+        const loaderLayer = document.getElementById('streamLoader');
 
-        // অটো হাইড টাইমার ভ্যারিয়েবল
         let controlsTimer = null;
         let isPanelActive = true;
 
-        // জেস্টার লজিক ভ্যারিয়েবলস
         let startY = 0;
         let startVol = 1;
         let startBright = 100;
-        let currentVolume = 1; // Default Max
-        let currentBrightness = 100; // Default Max
+        let currentBrightness = 100;
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchPlaylist();
             setupGestureListeners();
             setupPanelAutoHideTrigger();
+            
+            // ভিডিও প্লে স্ট্যাটাস ট্র্যাক করে লোডার অফ করার ইভেন্ট
+            videoElement.addEventListener('playing', () => { loaderLayer.style.display = 'none'; });
+            videoElement.addEventListener('waiting', () => { loaderLayer.style.display = 'flex'; });
         });
 
-        // 🚀 ২ নম্বর ফিচার: প্যানেল ক্লিক ও টাচ করলে আসা এবং ১০ সেকেন্ড পর অটো হাইড হওয়া
         function setupPanelAutoHideTrigger() {
-            // প্লেয়ার স্ক্রিনে ক্লিক করলে টগল হবে
             document.getElementById('gestureBox').addEventListener('click', () => {
-                if (!isPanelActive) {
-                    showControlPanel();
-                } else {
-                    hideControlPanel();
-                }
+                if (!isPanelActive) showControlPanel();
+                else hideControlPanel();
             });
-
-            // যেকোনো বাটন বা অ্যাকশনে টাচ পড়লে টাইমার রিসেট হবে
             document.getElementById('playerContainer').addEventListener('touchstart', resetAutoHideTimer);
             document.getElementById('playerContainer').addEventListener('mousemove', resetAutoHideTimer);
-            
-            showControlPanel(); // শুরুতে শো করবে
+            showControlPanel();
         }
 
         function showControlPanel() {
@@ -379,82 +542,74 @@
 
         function hideControlPanel() {
             document.getElementById('controlsLayer').classList.add('hidden');
-            document.getElementById('settingsMenu').style.display = 'none'; // সেটিংস প্যানেল খোলা থাকলে তাও হাইড হবে
+            document.getElementById('settingsMenu').style.display = 'none';
             isPanelActive = false;
         }
 
         function resetAutoHideTimer() {
             clearTimeout(controlsTimer);
             if (isPanelActive) {
-                controlsTimer = setTimeout(() => {
-                    hideControlPanel();
-                }, 10000); // 🚀 ১০ সেকেন্ড পর হাইড হবে
+                controlsTimer = setTimeout(() => { hideControlPanel(); }, 7000);
             }
         }
 
-        // 🚀 ৩ নম্বর ফিচার: সোয়াইপ করে ব্রাইটনেস ও ভলিউম নিয়ন্ত্রণ (Gesture Engine)
         function setupGestureListeners() {
             const leftSide = document.getElementById('leftSideBright');
             const rightSide = document.getElementById('rightSideVol');
+            const bOSD = document.getElementById('brightnessOSD');
+            const vOSD = document.getElementById('volumeOSD');
 
-            // --- বাম পাশে ব্রাইটনেস কন্ট্রোল ---
             leftSide.addEventListener('touchstart', (e) => {
                 startY = e.touches[0].clientY;
                 startBright = currentBrightness;
-                document.getElementById('brightnessOSD').style.opacity = '1';
+                bOSD.classList.add('active');
             });
 
             leftSide.addEventListener('touchmove', (e) => {
                 e.preventDefault();
                 let deltaY = startY - e.touches[0].clientY;
-                let change = Math.round((deltaY / window.innerHeight) * 200); // সেন্সিটিভিটি টিউনিং
+                let change = Math.round((deltaY / window.innerHeight) * 220);
                 let newBright = Math.min(100, Math.max(10, startBright + change));
                 
                 currentBrightness = newBright;
-                // ব্রাইটনেস ফিল্টার মডিউল (কালো ব্যাকগ্রাউন্ড অপাসিটি দিয়ে ব্রাইটনেস কমানো)
                 let alpha = (100 - newBright) / 100;
-                document.getElementById('brightLayer').style.background = `rgba(0, 0, 0, ${alpha * 0.8})`; 
+                document.getElementById('brightLayer').style.background = `rgba(0, 0, 0, ${alpha * 0.95})`; 
                 
                 document.getElementById('brightText').innerText = newBright + '%';
+                document.getElementById('brightFill').style.height = newBright + '%';
                 resetAutoHideTimer();
             });
 
-            leftSide.addEventListener('touchend', () => {
-                setTimeout(() => document.getElementById('brightnessOSD').style.opacity = '0', 800);
-            });
+            leftSide.addEventListener('touchend', () => { setTimeout(() => bOSD.classList.remove('active'), 500); });
 
-            // --- ডান পাশে ভলিউম কন্ট্রোল ---
             rightSide.addEventListener('touchstart', (e) => {
                 startY = e.touches[0].clientY;
                 startVol = videoElement.volume;
-                document.getElementById('volumeOSD').style.opacity = '1';
+                vOSD.classList.add('active');
             });
 
             rightSide.addEventListener('touchmove', (e) => {
                 e.preventDefault();
                 let deltaY = startY - e.touches[0].clientY;
-                let change = deltaY / window.innerHeight * 1.5;
+                let change = deltaY / window.innerHeight * 1.8;
                 let newVol = Math.min(1, Math.max(0, startVol + change));
                 
                 videoElement.volume = newVol;
                 let volPercent = Math.round(newVol * 100);
                 
-                // আইকন পরিবর্তন লজিক
                 const volIcon = document.querySelector('#volumeOSD i');
                 if(volPercent === 0) volIcon.className = "fa-solid fa-volume-xmark";
                 else if(volPercent < 50) volIcon.className = "fa-solid fa-volume-low";
                 else volIcon.className = "fa-solid fa-volume-high";
 
                 document.getElementById('volText').innerText = volPercent + '%';
+                document.getElementById('volFill').style.height = volPercent + '%';
                 resetAutoHideTimer();
             });
 
-            rightSide.addEventListener('touchend', () => {
-                setTimeout(() => document.getElementById('volumeOSD').style.opacity = '0', 800);
-            });
+            rightSide.addEventListener('touchend', () => { setTimeout(() => vOSD.classList.remove('active'), 500); });
         }
 
-        // Fetch & Parse M3U
         async function fetchPlaylist() {
             try {
                 const res = await fetch(playlistM3uUrl);
@@ -490,7 +645,7 @@
             list.forEach(chan => {
                 const card = document.createElement('div');
                 card.className = 'channel-card';
-                let logoImg = chan.logo ? `<img src="${chan.logo}" onerror="this.src='https://via.placeholder.com/50?text=TV'">` : `<img src="https://via.placeholder.com/50?text=TV">`;
+                let logoImg = chan.logo ? `<img src="${chan.logo}" onerror="this.src='https://via.placeholder.com/60?text=TV'">` : `<img src="https://via.placeholder.com/60?text=TV">`;
                 card.innerHTML = `
                     <div class="logo-wrap">${logoImg}</div>
                     <div class="card-name">${chan.name}</div>
@@ -502,6 +657,10 @@
 
         function launchPlayer(channel) {
             activeSelectedChannel = channel;
+            
+            // 🔄 লোডার স্কিমা শো
+            loaderLayer.style.display = 'flex';
+            
             document.getElementById('playerContainer').style.display = 'block';
             document.getElementById('playerTitle').innerText = channel.name;
             document.getElementById('playerLogo').src = channel.logo || 'https://via.placeholder.com/30?text=TV';
@@ -526,8 +685,6 @@
                         hlsInstance.levels.forEach((lvl, idx) => {
                             if(lvl.height) {
                                 let label = lvl.height + 'p';
-                                if(lvl.height === 1440) label = "1440p (2K)";
-                                if(lvl.height === 2160) label = "2160p (4K)";
                                 let opt = document.createElement('option');
                                 opt.value = idx;
                                 opt.textContent = label;
@@ -535,9 +692,14 @@
                             }
                         });
                     }
-                    videoElement.play().catch(e => console.log("Autoplay caught"));
+                    videoElement.play().catch(e => console.log("Play block catch"));
                     updatePlayButtonIcon(true);
                 });
+                
+                hlsInstance.on(Hls.Events.ERROR, function (event, data) {
+                    if (data.fatal) { loaderLayer.style.display = 'flex'; }
+                });
+                
             } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
                 videoElement.src = url;
                 videoElement.addEventListener('loadedmetadata', () => {
@@ -560,11 +722,7 @@
 
         function updatePlayButtonIcon(isPlaying) {
             const icon = document.querySelector('#customPlayBtn i');
-            if (isPlaying) {
-                icon.className = "fa-solid fa-pause";
-            } else {
-                icon.className = "fa-solid fa-play";
-            }
+            icon.className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
         }
 
         function toggleSettingsOverlay() {
@@ -576,15 +734,11 @@
         function changeResolution(val) {
             if(!hlsInstance) return;
             let index = parseInt(val);
-            if(index === -1) {
-                hlsInstance.currentLevel = -1;
-            } else if(hlsInstance.levels.length > index) {
-                hlsInstance.currentLevel = index;
-            }
+            if(index === -1) hlsInstance.currentLevel = -1;
+            else if(hlsInstance.levels.length > index) hlsInstance.currentLevel = index;
             toggleSettingsOverlay();
         }
 
-        // 🚀 ১ নম্বর ফিক্স: রিয়েল ১০০% স্ট্রেচ রেশিও প্রয়োগ করা (বামের কালো জায়গা ফিক্সড)
         function changeAspectRatio() {
             const wrap = document.getElementById('videoWrapper');
             const label = document.getElementById('ratioLabel');
@@ -602,11 +756,8 @@
 
         async function activatePiP() {
             try {
-                if(document.pictureInPictureElement) {
-                    await document.exitPictureInPicture();
-                } else {
-                    await videoElement.requestPictureInPicture();
-                }
+                if(document.pictureInPictureElement) await document.exitPictureInPicture();
+                else await videoElement.requestPictureInPicture();
             } catch(e) { console.log(e); }
             toggleSettingsOverlay();
         }
@@ -615,15 +766,15 @@
             const container = document.getElementById('playerContainer');
             try {
                 if (!document.fullscreenElement) {
-                    if (container.requestFullscreen) { await container.requestFullscreen(); }
-                    else if (container.webkitRequestFullscreen) { await container.webkitRequestFullscreen(); }
+                    if (container.requestFullscreen) await container.requestFullscreen();
+                    else if (container.webkitRequestFullscreen) await container.webkitRequestFullscreen();
                     
                     if (screen.orientation && screen.orientation.lock) {
-                        await screen.orientation.lock('landscape').catch(e => console.log("Orientation lock restriction"));
+                        await screen.orientation.lock('landscape').catch(e => console.log("Orientation error"));
                     }
                 } else {
-                    if (document.exitFullscreen) { await document.exitFullscreen(); }
-                    if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
+                    if (document.exitFullscreen) await document.exitFullscreen();
+                    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
                 }
             } catch (err) { console.error(err); }
             resetAutoHideTimer();
@@ -631,6 +782,7 @@
 
         function switchServer(srvNum) {
             if(!activeSelectedChannel) return;
+            loaderLayer.style.display = 'flex'; // সার্ভার সুইচে লোডার রান
             document.querySelectorAll('.srv-btn').forEach((btn, i) => {
                 btn.classList.toggle('active', i === (srvNum - 1));
             });
@@ -641,18 +793,18 @@
         }
 
         function refreshStream() {
-            if(activeSelectedChannel) loadStreamSource(activeSelectedChannel.url);
+            if(activeSelectedChannel) {
+                loaderLayer.style.display = 'flex';
+                loadStreamSource(activeSelectedChannel.url);
+            }
             resetAutoHideTimer();
         }
 
         function closePlayer() {
             if(hlsInstance) hlsInstance.destroy();
             document.getElementById('playerContainer').style.display = 'none';
+            loaderLayer.style.display = 'none';
             clearTimeout(controlsTimer);
-        }
-
-        function scrollToGrid() {
-            document.getElementById('listSection').scrollIntoView({behavior: 'smooth'});
         }
 
         document.getElementById('searchChan').addEventListener('input', (e) => {
