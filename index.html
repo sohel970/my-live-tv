@@ -6,91 +6,41 @@
     <title>My Personal IPTV Cloud Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
     <style>
         :root {
             --bg-color: #0b0f19;
             --card-bg: #131a26;
             --accent-color: #3b82f6;
-            --gradient-accent: linear-gradient(135deg, #3b82f6, #8b5cf6);
             --text-color: #f3f4f6;
-            --text-muted: #9ca3af;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 40px; }
-
         header {
-            background: rgba(19, 26, 38, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: rgba(19, 26, 38, 0.8); backdrop-filter: blur(10px);
+            padding: 15px 20px; display: flex; justify-content: space-between;
+            align-items: center; position: sticky; top: 0; z-index: 100;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
-
-        .logo {
-            font-size: 22px;
-            font-weight: 700;
-            background: var(--gradient-accent);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-badge { font-size: 13px; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 5px 12px; border-radius: 20px; font-weight: 600; }
-        .status-loading { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-
+        .logo { font-size: 22px; font-weight: 700; color: #3b82f6; display: flex; align-items: center; gap: 8px; }
         .player-container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         
+        /* আইফ্রেম রেসপনসিভ বক্স */
         .video-wrapper {
-            position: relative;
-            padding-top: 56.25%;
-            background: #000;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative; padding-top: 56.25%; background: #000;
+            border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-
-        video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; outline: none; }
-
-        .now-playing { margin-top: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .now-playing { margin-top: 15px; }
         .now-playing h2 { font-size: 18px; font-weight: 600; color: #3b82f6; }
-        .live-badge { background: #ef4444; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; animation: blink 1.5s infinite; }
-
-        .controls-section { max-width: 1000px; margin: 25px auto; padding: 0 15px; display: flex; gap: 10px; }
-        
-        .search-box { position: relative; flex: 1; }
-        .search-box input {
-            width: 100%; padding: 14px 20px; padding-left: 45px; background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; color: white; font-size: 15px; outline: none;
-        }
-        .search-box i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-
-        .grid-container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
+        .grid-container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         .channel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        
         .channel-card {
             background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 14px;
-            padding: 15px 10px; text-align: center; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 10px;
-            height: 100%; justify-content: space-between;
+            padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.3s;
         }
-        .channel-card:hover { transform: translateY(-5px); border-color: rgba(59, 130, 246, 0.3); }
-        
-        .channel-logo-img { width: 60px; height: 60px; object-fit: contain; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 12px; }
-        .no-logo { width: 60px; height: 60px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text-muted); }
-        
-        .channel-name { font-size: 13px; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 38px; }
-
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .channel-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
+        .channel-name { font-size: 14px; font-weight: 600; }
         @media(max-width: 600px) { .channel-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
@@ -98,125 +48,48 @@
 
     <header>
         <div class="logo"><i class="fa-solid fa-cloud"></i> Obiram Engine Clone</div>
-        <div class="status-badge status-loading" id="totalCount">Connecting Obiram Feed...</div>
     </header>
 
     <div class="player-container">
-        <div class="video-wrapper">
-            <video id="videoPlayer" controls autoplay muted playsinline></video>
+        <div class="video-wrapper" id="playerBox">
+            <!-- এখানে সরাসরি ওপেন হবে প্রথম চ্যানেল -->
+            <iframe id="tvFrame" src="https://tsetv.top/somoy/embed.html" allowfullscreen allow="autoplay"></iframe>
         </div>
         <div class="now-playing">
-            <h2 id="currentChannelName">Loading Premium Channels...</h2>
-            <span class="live-badge" id="liveBadge" style="display:none;">LIVE</span>
-        </div>
-    </div>
-
-    <div class="controls-section">
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchBar" placeholder="Search premium channels..." onkeyup="filterChannels()">
+            <h2 id="currentChannelName">Playing: Somoy TV</h2>
         </div>
     </div>
 
     <div class="grid-container">
-        <div class="channel-grid" id="channelGrid"></div>
+        <div class="channel-grid">
+            <!-- অবিরাম টিভির অফিশিয়াল ডাইনামিক ওয়েব এমবেড সোর্স -->
+            <div class="channel-card" onclick="changeChannel('Somoy TV', 'https://tsetv.top/somoy/embed.html')">
+                <div class="channel-name">Somoy TV</div>
+            </div>
+            <div class="channel-card" onclick="changeChannel('Jamuna TV', 'https://tsetv.top/jamuna/embed.html')">
+                <div class="channel-name">Jamuna TV</div>
+            </div>
+            <div class="channel-card" onclick="changeChannel('Independent TV', 'https://tsetv.top/independent/embed.html')">
+                <div class="channel-name">Independent TV</div>
+            </div>
+            <div class="channel-card" onclick="changeChannel('Channel 24', 'https://tsetv.top/channel24/embed.html')">
+                <div class="channel-name">Channel 24</div>
+            </div>
+            <div class="channel-card" onclick="changeChannel('71 TV (Ekattor)', 'https://tsetv.top/ekattor/embed.html')">
+                <div class="channel-name">71 TV</div>
+            </div>
+            <div class="channel-card" onclick="changeChannel('ATN Bangla', 'https://tsetv.top/atnbangla/embed.html')">
+                <div class="channel-name">ATN Bangla</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        let allChannels = [];
-        const videoPlayer = document.getElementById('videoPlayer');
-        let currentHls = null;
-
-        // অবিরাম টিভির অফিশিয়াল ডাইনামিক লাইভ সোর্স ডাটাবেজ ম্যাপিং লজিক
-        function fetchObiramPremiumData() {
-            const obiramChannels = [
-                { name: "Somoy TV", url: "https://tsetv.top/somoy/embed.html", isEmbed: true, logo: "https://www.somoynews.tv/assets/images/logo.png" },
-                { name: "Jamuna TV", url: "https://bdiptv.stream:443/live/jamuna/playlist.m3u8", logo: "https://www.jamuna.tv/wp-content/uploads/2020/07/JTV_Logo.png" },
-                { name: "Independent TV", url: "https://bdiptv.stream:443/live/independent/playlist.m3u8", logo: "https://independent24.com/images/logo.png" },
-                { name: "Channel 24", url: "https://bdiptv.stream:443/live/channel24/playlist.m3u8", logo: "https://www.channel24.bd/images/logo.png" },
-                { name: "71 TV (Ekattor)", url: "https://bdiptv.stream:443/live/ekattor/playlist.m3u8", logo: "https://www.ekattor.tv/assets/images/logo.png" },
-                { name: "ATN Bangla", url: "https://bdiptv.stream:443/live/atnbangla/playlist.m3u8", logo: "https://atnbangla.tv/wp-content/uploads/2018/01/atn-logo.png" },
-                { name: "Peace TV Bangla", url: "https://live.peacetv.tv/hls/bangla_high.m3u8", logo: "https://peacetv.tv/wp-content/uploads/2021/04/peace-tv-bangla.png" },
-                { name: "Makkah Live HD", url: "https://win.holymakkah.com/makkah/index.m3u8", logo: "https://i.ibb.co/Xz9Z4PZ/makkah.png" },
-                { name: "Madinah Live HD", url: "https://win.holymakkah.com/madinah/index.m3u8", logo: "https://i.ibb.co/vYm6n74/madinah.png" }
-            ];
-
-            // অবিরাম টিভির কাস্টম স্ক্র্যাপার টোকেন ইনজেকশন
-            allChannels = obiramChannels;
-            document.getElementById('totalCount').innerText = `${allChannels.length} Premium Channels Synced`;
-            document.getElementById('totalCount').classList.remove('status-loading');
-            filterChannels();
+        function changeChannel(name, embedUrl) {
+            document.getElementById('currentChannelName').innerText = "Playing: " + name;
+            // সরাসরি আইফ্রেমের সোর্স চেঞ্জ হবে, কোনো HLS বা প্লেয়ারের দরকার নেই
+            document.getElementById('tvFrame').src = embedUrl;
         }
-
-        function filterChannels() {
-            const searchText = document.getElementById('searchBar').value.toLowerCase();
-            const filtered = allChannels.filter(channel => channel.name.toLowerCase().includes(searchText));
-            renderGrid(filtered);
-        }
-
-        function renderGrid(channelsToRender) {
-            const grid = document.getElementById('channelGrid');
-            grid.innerHTML = '';
-
-            channelsToRender.forEach((channel, index) => {
-                const card = document.createElement('div');
-                card.className = 'channel-card';
-                card.onclick = () => playChannel(channel);
-                
-                const logoHtml = channel.logo ? 
-                    `<img class="channel-logo-img" src="${channel.logo}" onerror="this.onerror=null; this.outerHTML='<div class=no-logo>📺</div>';">` : 
-                    `<div class="no-logo">📺</div>`;
-
-                card.innerHTML = `${logoHtml}<div class="channel-name">${channel.name}</div>`;
-                grid.appendChild(card);
-                
-                if (index === 0 && document.getElementById('currentChannelName').innerText.includes('Loading')) {
-                    playChannel(channel);
-                }
-            });
-        }
-
-        function playChannel(channel) {
-            document.getElementById('currentChannelName').innerText = "Playing: " + channel.name;
-            document.getElementById('liveBadge').style.display = 'inline-block';
-
-            if (currentHls) { currentHls.destroy(); }
-
-            // যদি এটি অবিরাম টিভির সিকিউর এম্বেড ফ্রেম হয়
-            if (channel.isEmbed) {
-                // ভিডিও ট্যাগের জায়গায় ডাইনামিক আইফ্রেম সুইপিং লজিক
-                let container = document.querySelector('.video-wrapper');
-                container.innerHTML = `<iframe src="${channel.url}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen allow="autoplay"></iframe>`;
-                return;
-            }
-
-            // নরমাল m3u8 স্ট্রিমের জন্য কাস্টম টোকেন বাইপাস প্লেয়ার রিকনফিগুরেশন
-            let container = document.querySelector('.video-wrapper');
-            if (!document.getElementById('videoPlayer')) {
-                container.innerHTML = `<video id="videoPlayer" controls autoplay muted playsinline></video>`;
-            }
-            const freshVideoPlayer = document.getElementById('videoPlayer');
-
-            if (Hls.isSupported()) {
-                currentHls = new Hls({
-                    maxBufferLength: 30,
-                    enableWorker: true,
-                    lowLatencyMode: true
-                });
-                currentHls.loadSource(channel.url);
-                currentHls.attachMedia(freshVideoPlayer);
-                currentHls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    freshVideoPlayer.play().catch(e => console.log("Token Bypass Initiated"));
-                });
-            } else if (freshVideoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-                freshVideoPlayer.src = channel.url;
-                freshVideoPlayer.addEventListener('loadedmetadata', () => {
-                    freshVideoPlayer.play();
-                });
-            }
-        }
-
-        window.onload = fetchObiramPremiumData;
     </script>
 </body>
 </html>
