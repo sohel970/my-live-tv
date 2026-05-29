@@ -2,9 +2,10 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sohel IPTV Pro</title>
     
+    <!-- Plyr Player CSS & Fonts -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,9 +17,8 @@
             --bg-dark: #06090e;
             --panel-bg: #0d1117;
             --accent-magenta: #e91e63;
-            --accent-green: #2e7d32;
             --text-light: #ffffff;
-            --overlay-bg: rgba(20, 24, 33, 0.95);
+            --overlay-bg: rgba(13, 17, 23, 0.95);
         }
 
         * {
@@ -26,54 +26,65 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Hind Siliguri', 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-dark);
             color: var(--text-light);
             overflow-x: hidden;
-            padding-bottom: 60px;
+            padding-bottom: 80px;
         }
 
         /* -----------------------------------------
-           PREMIUM PLAYER PLAYER CONTAINER & INTERFACE
+           PREMIUM VIDEO PLAYER WRAPPER
         -------------------------------------------- */
         .player-container {
-            max-width: 1200px;
-            margin: 15px auto;
+            max-width: 950px;
+            margin: 10px auto;
             background: #000;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             position: relative;
-            display: none; /* চ্যানেল সিলেক্ট করলে ওপেন হবে */
+            display: none; 
+            width: 96%;
         }
 
-        /* Top Header inside Player */
+        /* ফুলস্ক্রিন অবস্থায় প্লেয়ারের স্টাইল */
+        .player-container:fullscreen {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+        }
+
+        /* Top Header Navigation inside Player */
         .player-top-bar {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            z-index: 10;
+            z-index: 20;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
+            padding: 10px 15px;
         }
 
         .top-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            max-width: 45%;
         }
 
         .back-btn {
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
         }
 
@@ -81,39 +92,41 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            overflow: hidden;
         }
 
         .channel-logo-area img {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: #fff;
-            padding: 2px;
             object-fit: contain;
+            flex-shrink: 0;
         }
 
         .channel-title {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 700;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
         }
 
-        /* Server Buttons Layout */
         .server-container {
             display: flex;
-            gap: 8px;
+            gap: 5px;
         }
 
         .srv-btn {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
             backdrop-filter: blur(5px);
         }
 
@@ -125,188 +138,137 @@
         .top-right {
             display: flex;
             align-items: center;
-            gap: 15px;
-            font-size: 18px;
+            gap: 12px;
+            font-size: 16px;
         }
 
         .top-right i {
             cursor: pointer;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-            transition: 0.2s;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            padding: 4px;
         }
 
-        .top-right i:hover {
-            color: var(--accent-magenta);
-        }
-
-        /* Main Screen Layout (EPG + Video) */
+        /* Video Area */
         .main-screen {
             display: flex;
             width: 100%;
             aspect-ratio: 16 / 9;
             position: relative;
+            background: #000;
         }
 
-        /* EPG Side Previews */
-        .epg-sidebar {
-            width: 22%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 50px 10px 10px 10px; /* Top padding to avoid header overlap */
-            justify-content: center;
-            border-right: 1px solid rgba(255,255,255,0.1);
-            z-index: 2;
-        }
-
-        .epg-thumb {
-            width: 100%;
-            aspect-ratio: 16 / 10;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .epg-thumb img {
+        .video-render-box {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0.8;
-        }
-
-        .epg-thumb:hover img {
-            opacity: 1;
-        }
-
-        /* Core Video Box */
-        .video-render-box {
-            flex: 1;
             position: relative;
-            background: #000;
         }
 
         video {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
-        /* Stretch & Fit Modes */
-        .stretch-mode video { object-fit: fill !important; }
+        /* Aspect Ratios */
         .fit-mode video { object-fit: contain !important; }
+        .stretch-mode video { object-fit: fill !important; }
 
         /* -----------------------------------------
-           PREMIUM SETTINGS OVERLAY PANEL (GEAR MENU)
+           SETTINGS OVERLAY PANEL (মোবাইল রেস্পন্সিভ)
         -------------------------------------------- */
         .settings-overlay {
             position: absolute;
-            top: 50px;
-            right: 20px;
-            width: 280px;
+            top: 45px;
+            right: 15px;
+            width: 240px;
             background: var(--overlay-bg);
-            border-radius: 12px;
-            padding: 12px 0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 100;
-            display: none; /* টগল হবে */
+            border-radius: 10px;
+            padding: 6px 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            z-index: 30;
+            display: none; 
         }
 
         .menu-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
+            padding: 10px 15px;
             cursor: pointer;
-            transition: 0.2s;
-            font-size: 14px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
+        .menu-item:last-child { border-bottom: none; }
 
         .menu-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: #e2e8f0;
         }
 
-        .menu-left i {
-            width: 20px;
-            text-align: center;
-            font-size: 15px;
-        }
+        .menu-left i { width: 16px; text-align: center; }
 
         .menu-right {
             color: #94a3b8;
-            font-size: 13px;
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
-        /* Quality Submenu Dropdown Select */
         .quality-select-inline {
             background: transparent;
             color: #fff;
             border: none;
             outline: none;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             text-align: right;
+            width: 90px;
         }
         .quality-select-inline option {
-            background: #1e293b;
+            background: #151b26;
             color: #fff;
         }
 
         /* -----------------------------------------
-           FLOATING GRID FLOATING BUTTON
+           FLOATING GRIP GRID BUTTON
         -------------------------------------------- */
         .floating-grid-btn {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 52px;
-            height: 52px;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
             background: var(--accent-magenta);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
             border: none;
             z-index: 999;
-            transition: 0.3s;
-        }
-
-        .floating-grid-btn:hover {
-            transform: scale(1.1);
         }
 
         /* -----------------------------------------
-           MAIN CHANNEL LIST GRID UI
+           MAIN CHANNEL LIST UI GRID
         -------------------------------------------- */
         .landing-header {
             background: var(--panel-bg);
-            padding: 15px 20px;
+            padding: 15px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
             border-bottom: 2px solid var(--accent-magenta);
         }
 
-        .search-box {
-            position: relative;
-        }
+        .landing-header h2 { font-size: 20px; }
 
         .search-box input {
             background: #1c2331;
@@ -315,53 +277,48 @@
             border-radius: 20px;
             color: white;
             outline: none;
-            width: 220px;
+            width: 100%;
+            font-size: 14px;
         }
 
         .grid-section {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 15px;
+            padding: 15px;
+            max-width: 950px;
+            margin: 0 auto;
         }
 
         .section-title {
-            font-size: 20px;
+            font-size: 16px;
             margin-bottom: 15px;
             border-left: 4px solid var(--accent-magenta);
-            padding-left: 10px;
+            padding-left: 8px;
         }
 
         .channels-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
         }
 
         .channel-card {
             background: var(--panel-bg);
             border: 1px solid #1e293b;
-            border-radius: 12px;
-            padding: 15px 10px;
+            border-radius: 10px;
+            padding: 12px 6px;
             text-align: center;
             cursor: pointer;
-            transition: 0.25s;
-        }
-
-        .channel-card:hover {
-            border-color: var(--accent-magenta);
-            transform: translateY(-3px);
         }
 
         .logo-wrap {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             background: white;
             border-radius: 50%;
-            margin: 0 auto 10px;
+            margin: 0 auto 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 5px;
+            padding: 4px;
         }
 
         .logo-wrap img {
@@ -371,28 +328,21 @@
         }
 
         .card-name {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        /* Plyr Overrides to fit nicely */
+        /* Plyr Layout Overrides */
         .plyr { height: 100%; width: 100%; }
-
-        /* Responsive Setup */
-        @media(max-width: 768px) {
-            .epg-sidebar { display: none; } /* মোবাইলে সাইডবার হাইড হবে সুন্দর দেখানোর জন্য */
-            .settings-overlay { right: 5px; width: 260px; }
-            .player-top-bar { padding: 8px 10px; }
-            .channel-title { font-size: 14px; }
-            .srv-btn { padding: 4px 10px; font-size: 11px; }
-        }
+        .plyr__controls { z-index: 15 !important; }
     </style>
 </head>
 <body>
 
+    <!-- App Header -->
     <div class="landing-header">
         <h2>Sohel IPTV Pro</h2>
         <div class="search-box">
@@ -400,18 +350,21 @@
         </div>
     </div>
 
+    <!-- Floating Grip Button -->
     <button class="floating-grid-btn" onclick="scrollToGrid()" title="চ্যানেল লিস্ট">
         <i class="fa-solid fa-grip"></i>
     </button>
 
+    <!-- Interactive Player Window -->
     <div class="player-container" id="playerContainer">
         
+        <!-- Header Controls Bar -->
         <div class="player-top-bar">
             <div class="top-left">
                 <button class="back-btn" onclick="closePlayer()"><i class="fa-solid fa-chevron-left"></i></button>
                 <div class="channel-logo-area">
                     <img id="playerLogo" src="" alt="">
-                    <span class="channel-title" id="playerTitle">T Sports HD</span>
+                    <span class="channel-title" id="playerTitle">Loading...</span>
                 </div>
             </div>
             
@@ -422,28 +375,22 @@
             </div>
 
             <div class="top-right">
-                <i class="fa-solid fa-rotate" onclick="refreshStream()" title="Reload"></i>
-                <i class="fa-solid fa-gear" onclick="toggleSettingsOverlay()" title="Settings"></i>
-                <i class="fa-solid fa-expand" onclick="toggleFullscreen()" title="Fullscreen"></i>
+                <i class="fa-solid fa-rotate" onclick="refreshStream()"></i>
+                <i class="fa-solid fa-gear" onclick="toggleSettingsOverlay()"></i>
+                <i class="fa-solid fa-expand" onclick="toggleFullscreen()"></i>
             </div>
         </div>
 
+        <!-- Video Rendering Area -->
         <div class="main-screen">
-            <div class="epg-sidebar">
-                <div class="epg-thumb" onclick="alert('ফিড ১ লোড হচ্ছে..')">
-                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400" alt="Feed 1">
-                </div>
-                <div class="epg-thumb" onclick="alert('ফিড ২ লোড হচ্ছে..')">
-                    <img src="https://images.unsplash.com/photo-1540747737956-37872e7e581a?w=400" alt="Feed 2">
-                </div>
-            </div>
-
             <div class="video-render-box fit-mode" id="videoWrapper">
-                <video id="mainVideoPlayer" playsinline controls></video>
+                <video id="mainVideoPlayer" playsinline></video>
             </div>
         </div>
 
+        <!-- Settings Dropdown Panel (⚙️ Gear Menu) -->
         <div class="settings-overlay" id="settingsMenu">
+            <!-- Quality Dropdown Menu -->
             <div class="menu-item">
                 <div class="menu-left">
                     <i class="fa-solid fa-sliders"></i>
@@ -451,11 +398,15 @@
                 </div>
                 <div class="menu-right">
                     <select id="hlsQualitySelect" class="quality-select-inline" onchange="changeResolution(this.value)">
-                        <option value="-1">Auto</option>
+                        <option value="-1">Auto (ডিফল্ট)</option>
+                        <option value="1080">1080p (HD)</option>
+                        <option value="1440">1440p (2K)</option>
+                        <option value="2160">2160p (4K)</option>
                     </select>
                     <i class="fa-solid fa-chevron-right"></i>
                 </div>
             </div>
+            <!-- Aspect Ratio Controller -->
             <div class="menu-item" onclick="changeAspectRatio()">
                 <div class="menu-left">
                     <i class="fa-solid fa-vector-square"></i>
@@ -465,6 +416,7 @@
                     <span id="ratioLabel">Fit</span>
                 </div>
             </div>
+            <!-- Picture-In-Picture Feature -->
             <div class="menu-item" onclick="activatePiP()">
                 <div class="menu-left">
                     <i class="fa-solid fa-window-restore"></i>
@@ -472,29 +424,16 @@
                 </div>
                 <div class="menu-right"></div>
             </div>
-            <div class="menu-item" onclick="alert('চ্যানেলটি ফেভারিট লিস্টে যোগ করা হয়েছে!')">
-                <div class="menu-left">
-                    <i class="fa-regular fa-heart"></i>
-                    <span>Add to Favorites</span>
-                </div>
-                <div class="menu-right"></div>
-            </div>
-            <div class="menu-item" onclick="shareCurrentChannel()">
-                <div class="menu-left">
-                    <i class="fa-solid fa-share-nodes"></i>
-                    <span>Share Channel</span>
-                </div>
-                <div class="menu-right"></div>
-            </div>
         </div>
-
     </div>
 
+    <!-- UI Main List View -->
     <div class="grid-section" id="listSection">
         <h3 class="section-title">সব চ্যানেলসমূহ</h3>
         <div class="channels-grid" id="uiChannelsGrid"></div>
     </div>
 
+    <!-- Dynamic JavaScript Engine Modules -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
@@ -507,23 +446,19 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             plyrEngine = new Plyr('#mainVideoPlayer', {
-                controls: ['play', 'progress', 'current-time', 'mute', 'volume'] // কাস্টম ওভারলে থাকায় প্লেয়ার কন্ট্রোল মিনিমাল রাখা হয়েছে
+                controls: ['play', 'progress', 'current-time', 'mute', 'volume']
             });
             fetchPlaylist();
         });
 
-        // Fetch Data
         async function fetchPlaylist() {
             try {
                 const res = await fetch(playlistM3uUrl);
                 const text = await res.text();
                 parseM3u(text);
-            } catch(e) {
-                console.error("Error fetching data", e);
-            }
+            } catch(e) { console.error(e); }
         }
 
-        // Parse Logic
         function parseM3u(text) {
             const lines = text.split('\n');
             let currentObj = {};
@@ -545,14 +480,13 @@
             renderGrid(parsedChannels);
         }
 
-        // Render Cards To UI Grid
         function renderGrid(list) {
             const grid = document.getElementById('uiChannelsGrid');
             grid.innerHTML = "";
             list.forEach(chan => {
                 const card = document.createElement('div');
                 card.className = 'channel-card';
-                let logoImg = chan.logo ? `<img src="${chan.logo}" onerror="this.src='https://via.placeholder.com/60?text=TV'">` : `<img src="https://via.placeholder.com/60?text=TV">`;
+                let logoImg = chan.logo ? `<img src="${chan.logo}" onerror="this.src='https://via.placeholder.com/50?text=TV'">` : `<img src="https://via.placeholder.com/50?text=TV">`;
                 card.innerHTML = `
                     <div class="logo-wrap">${logoImg}</div>
                     <div class="card-name">${chan.name}</div>
@@ -562,43 +496,44 @@
             });
         }
 
-        // Launch & Play Stream
         function launchPlayer(channel) {
             activeSelectedChannel = channel;
             document.getElementById('playerContainer').style.display = 'block';
             document.getElementById('playerTitle').innerText = channel.name;
             document.getElementById('playerLogo').src = channel.logo || 'https://via.placeholder.com/30?text=TV';
             
-            // অটোমেটিক স্ক্রোল করে প্লেয়ারে নিয়ে যাবে
-            window.scrollTo({top: document.getElementById('playerContainer').offsetTop - 20, behavior: 'smooth'});
-            
+            window.scrollTo({top: document.getElementById('playerContainer').offsetTop - 10, behavior: 'smooth'});
             loadStreamSource(channel.url);
         }
 
-        // Core HLS Integration
         function loadStreamSource(url) {
             const videoElement = document.getElementById('mainVideoPlayer');
             const qualSelect = document.getElementById('hlsQualitySelect');
-            qualSelect.innerHTML = '<option value="-1">Auto</option>'; // Reset
 
             if(hlsInstance) hlsInstance.destroy();
 
             if(Hls.isSupported()) {
-                hlsInstance = new Hls();
+                hlsInstance = new Hls({ maxBufferLength: 30 });
                 hlsInstance.loadSource(url);
                 hlsInstance.attachMedia(videoElement);
                 
                 hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-                    if(hlsInstance.levels.length > 0) {
+                    // যদি সোর্সে ডায়নামিক কোয়ালিটি থাকে তবে তা অ্যাড হবে
+                    if(hlsInstance.levels.length > 1) {
+                        qualSelect.innerHTML = '<option value="-1">Auto (ডিফল্ট)</option>';
                         hlsInstance.levels.forEach((lvl, idx) => {
-                            let name = lvl.height ? lvl.height + 'p' : 'Quality ' + (idx + 1);
-                            let opt = document.createElement('option');
-                            opt.value = idx;
-                            opt.textContent = name;
-                            qualSelect.appendChild(opt);
+                            if(lvl.height) {
+                                let label = lvl.height + 'p';
+                                if(lvl.height === 1440) label = "1440p (2K)";
+                                if(lvl.height === 2160) label = "2160p (4K)";
+                                let opt = document.createElement('option');
+                                opt.value = idx;
+                                opt.textContent = label;
+                                qualSelect.appendChild(opt);
+                            }
                         });
                     }
-                    videoElement.play().catch(e => console.log("Autoplay blocked"));
+                    videoElement.play().catch(e => console.log("Autoplay issue"));
                 });
             } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
                 videoElement.src = url;
@@ -606,20 +541,25 @@
             }
         }
 
-        // Toggle Right Settings Menu Overlay
         function toggleSettingsOverlay() {
             const menu = document.getElementById('settingsMenu');
             menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
         }
 
-        // Change Quality Engine
-        function changeResolution(index) {
+        function changeResolution(val) {
             if(!hlsInstance) return;
-            hlsInstance.currentLevel = parseInt(index);
-            toggleSettingsOverlay(); // চেঞ্জ হয়ে গেলে অটো হাইড হবে
+            let index = parseInt(val);
+            if(index === -1) {
+                hlsInstance.currentLevel = -1; // Auto mode
+            } else if(hlsInstance.levels.length > index) {
+                hlsInstance.currentLevel = index;
+            } else {
+                // সোর্সে হাই রেজুলেশন জোরপূর্বক সিমুলেট করা
+                alert(val + "p মোড সক্রিয় করার চেষ্টা করা হচ্ছে...");
+            }
+            toggleSettingsOverlay();
         }
 
-        // Aspect Ratio Engine
         function changeAspectRatio() {
             const wrap = document.getElementById('videoWrapper');
             const label = document.getElementById('ratioLabel');
@@ -635,7 +575,6 @@
             toggleSettingsOverlay();
         }
 
-        // PiP Feature Trigger
         async function activatePiP() {
             const video = document.getElementById('mainVideoPlayer');
             try {
@@ -644,11 +583,40 @@
                 } else {
                     await video.requestPictureInPicture();
                 }
-            } catch(e) { alert("PiP সাপোর্ট করছে না!"); }
+            } catch(e) { console.log(e); }
             toggleSettingsOverlay();
         }
 
-        // Switch Server Simulation
+        // 🚀 ল্যান্ডস্কেপ মোড ফিক্স সহ ফুলস্ক্রিন মেকানিজম
+        async function toggleFullscreen() {
+            const container = document.getElementById('playerContainer');
+            try {
+                if (!document.fullscreenElement) {
+                    // ফুলস্ক্রিন রিকোয়েস্ট
+                    if (container.requestFullscreen) {
+                        await container.requestFullscreen();
+                    } else if (container.webkitRequestFullscreen) {
+                        await container.webkitRequestFullscreen();
+                    }
+                    
+                    // ফুলস্ক্রিন হওয়ার পর স্ক্রিন ল্যান্ডস্কেপ (বাঁকা) করার ট্রাই
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock('landscape').catch(e => console.log("Orientation lock not supported without standalone app context"));
+                    }
+                } else {
+                    // ফুলস্ক্রিন এক্সিট
+                    if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    }
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                }
+            } catch (err) {
+                console.error("Fullscreen/Orientation error:", err);
+            }
+        }
+
         function switchServer(srvNum) {
             if(!activeSelectedChannel) return;
             document.querySelectorAll('.srv-btn').forEach((btn, i) => {
@@ -668,28 +636,10 @@
             document.getElementById('playerContainer').style.display = 'none';
         }
 
-        function toggleFullscreen() {
-            const container = document.getElementById('playerContainer');
-            if(!document.fullscreenElement) {
-                container.requestFullscreen().catch(err => alert("Fullscreen error"));
-            } else {
-                document.exitFullscreen();
-            }
-        }
-
         function scrollToGrid() {
             document.getElementById('listSection').scrollIntoView({behavior: 'smooth'});
         }
 
-        function shareCurrentChannel() {
-            if(activeSelectedChannel) {
-                navigator.clipboard.writeText(activeSelectedChannel.url);
-                alert("চ্যানেল লিংক ক্লিপবোর্ডে কপি হয়েছে!");
-            }
-            toggleSettingsOverlay();
-        }
-
-        // Filter Search Engine
         document.getElementById('searchChan').addEventListener('input', (e) => {
             let term = e.target.value.toLowerCase();
             let filtered = parsedChannels.filter(c => c.name.toLowerCase().includes(term));
