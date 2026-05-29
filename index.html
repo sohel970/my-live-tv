@@ -1,1 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal IPTV Cloud Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #131a26;
+            --accent-color: #3b82f6;
+            --gradient-accent: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 40px; }
+
+        header {
+            background: rgba(19, 26, 38, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge { font-size: 13px; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 5px 12px; border-radius: 20px; font-weight: 600; }
+        .status-loading { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+
+        .player-container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        
+        .video-wrapper {
+            position: relative;
+            padding-top: 56.25%;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; outline: none; }
+
+        .now-playing { margin-top: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .now-playing h2 { font-size: 18px; font-weight: 600; color: #3b82f6; }
+        .live-badge { background: #ef4444; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; animation: blink 1.5s infinite; }
+
+        .controls-section { max-width: 1000px; margin: 25px auto; padding: 0 15px; display: flex; gap: 10px; }
+        
+        .search-box { position: relative; flex: 1; }
+        .search-box input {
+            width: 100%; padding: 14px 20px; padding-left: 45px; background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; color: white; font-size: 15px; outline: none;
+        }
+        .search-box i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .filter-select {
+            padding: 0 15px; background: var(--card-bg); color: white; border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px; outline: none; cursor: pointer; font-size: 14px; min-width: 150px;
+        }
+
+        .grid-container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
+        
+        .channel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        
+        .channel-card {
+            background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 14px;
+            padding: 15px 10px; text-align: center; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 10px;
+            height: 100%; justify-content: space-between;
+        }
+        .channel-card:hover { transform: translateY(-5px); border-color: rgba(59, 130, 246, 0.3); }
+        
+        .channel-logo-img { width: 60px; height: 60px; object-fit: contain; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 12px; }
+        .no-logo { width: 60px; height: 60px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text-muted); }
+        
+        .channel-name { font-size: 13px; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 38px; }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @media(max-width: 600px) { .channel-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><i class="fa-solid fa-cloud"></i> Obiram Engine Clone</div>
+        <div class="status-badge status-loading" id="totalCount">Connecting Proxy...</div>
+    </header>
+
+    <div class="player-container">
+        <div class="video-wrapper">
+            <video id="videoPlayer" controls autoplay muted playsinline></video>
+        </div>
+        <div class="now-playing">
+            <h2 id="currentChannelName">Fetching Real-time Playlist...</h2>
+            <span class="live-badge" id="liveBadge" style="display:none;">LIVE</span>
+        </div>
+    </div>
+
+    <div class="controls-section">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchBar" placeholder="Search channels..." onkeyup="filterChannels()">
+        </div>
+        
+        <select id="countryFilter" class="filter-select" onchange="filterChannels()">
+            <option value="all">All Channels</option>
+            <option value="BD" selected>Bangladesh Only 🇧🇩</option>
+        </select>
+    </div>
+
+    <div class="grid-container">
+        <div class="channel-grid" id="channelGrid"></div>
+    </div>
+
+    <script>
+        // ⚠️ গুরুত্বপূূর্ণ: নিচের লিঙ্কে 'YOUR_PROXY_URL_HERE' কেটে তোমার Cloudflare Worker-এর লিঙ্কটি বসিয়ে দাও
+        // উদাহরণ: const CLOUDFLARE_PROXY = "https://my-iptv-proxy.yourusername.workers.dev/?url=";
+        const CLOUDFLARE_PROXY = "https://twilight-rice-ea5b.sohelrana12a12.workers.dev/?url=";
+
+        // গিটহাবের সেই রিয়েল-টাইম ডাটাবেজ সোর্স
+    const DATA_SOURCE = "https://iptv-org.github.io/iptv/index.m3u";
+
+        let allChannels = [];
+        const videoPlayer = document.getElementById('videoPlayer');
+        let currentHls = null;
+
+        async function fetchLiveDatabase() {
+            try {
+                // সরাসরি ক্লাউডফ্লেয়ার প্রক্সি দিয়ে ডাটা ফেচ করা হচ্ছে, তাই কোনো CORS এরর আসবে না
+                const response = await fetch(CLOUDFLARE_PROXY + encodeURIComponent(DATA_SOURCE));
+                const text = await response.text();
+                parseM3U(text);
+            } catch (error) {
+                document.getElementById('totalCount').innerText = "Proxy Configuration Required!";
+                document.getElementById('totalCount').style.color = "#ef4444";
+                console.error(error);
+            }
+        }
+
+        function parseM3U(data) {
+            const lines = data.split('\n');
+            let currentChannel = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.startsWith('#EXTINF:')) {
+                    currentChannel = {};
+                    const nameMatch = line.match(/,(.+)$/);
+                    currentChannel.name = nameMatch ? nameMatch[1].trim() : "Unknown Channel";
+                    
+                    const logoMatch = line.match(/tvg-logo="([^"]+)"/);
+                    currentChannel.logo = logoMatch ? logoMatch[1] : "";
+                    
+                    const countryMatch = line.match(/tvg-country="([^"]+)"/);
+                    currentChannel.country = countryMatch ? countryMatch[1].toUpperCase() : "GLOBAL";
+                } else if (line.startsWith('http') && currentChannel) {
+                    currentChannel.url = line;
+                    allChannels.push(currentChannel);
+                    currentChannel = null;
+                }
+            }
+
+            const totalCountEl = document.getElementById('totalCount');
+            totalCountEl.innerText = `${allChannels.length} Channels Synced`;
+            totalCountEl.classList.remove('status-loading');
+            
+            filterChannels();
+        }
+
+        function filterChannels() {
+            const searchText = document.getElementById('searchBar').value.toLowerCase();
+            const selectedFilter = document.getElementById('countryFilter').value;
+            
+            const filtered = allChannels.filter(channel => {
+                const matchesSearch = channel.name.toLowerCase().includes(searchText);
+                const isBD = (channel.country === 'BD' || channel.name.toLowerCase().includes('bangla') || channel.name.toLowerCase().includes('somoy'));
+                
+                if (selectedFilter === 'BD') return matchesSearch && isBD;
+                return matchesSearch;
+            });
+
+            renderGrid(filtered);
+        }
+
+        function renderGrid(channelsToRender) {
+            const grid = document.getElementById('channelGrid');
+            grid.innerHTML = '';
+
+            // পারফরম্যান্স ধরে রাখতে প্রথম ১০০টি রেন্ডার হবে (Virtual DOM Concept)
+            const sliceLimit = channelsToRender.slice(0, 100);
+
+            sliceLimit.forEach((channel, index) => {
+                const card = document.createElement('div');
+                card.className = 'channel-card';
+                card.onclick = () => playChannel(channel);
+                
+                const logoHtml = channel.logo ? 
+                    `<img class="channel-logo-img" src="${channel.logo}" onerror="this.onerror=null; this.outerHTML='<div class=no-logo>📺</div>';">` : 
+                    `<div class="no-logo">📺</div>`;
+
+                card.innerHTML = `${logoHtml}<div class="channel-name">${channel.name}</div>`;
+                grid.appendChild(card);
+                
+                if (index === 0 && document.getElementById('currentChannelName').innerText.includes('Fetching')) {
+                    playChannel(channel);
+                }
+            });
+        }
+
+        function playChannel(channel) {
+    document.getElementById('currentChannelName').innerText = "Playing: " + channel.name;
+    document.getElementById('liveBadge').style.display = 'inline-block';
+
+    if (currentHls) { currentHls.destroy(); }
+
+    const proxiedStreamUrl = CLOUDFLARE_PROXY + encodeURIComponent(channel.url);
+
+    if (Hls.isSupported()) {
+        // hls.js কনফিগারেশন আপডেট করা হচ্ছে যাতে সাব-লিঙ্কগুলোও প্রক্সি হয়ে যায়
+        currentHls = new Hls({
+            xhrSetup: function (xhr, url) {
+                // যদি ব্রাউজার সাব-লিঙ্ক লোড করার সময় আমাদের প্রক্সি লিঙ্ক ভুলে যায়
+                if (!url.startsWith(CLOUDFLARE_PROXY)) {
+                    const resolvedUrl = CLOUDFLARE_PROXY + encodeURIComponent(url);
+                    xhr.open('GET', resolvedUrl, true);
+                }
+            }
+        });
+        currentHls.loadSource(proxiedStreamUrl);
+        currentHls.attachMedia(videoPlayer);
+        currentHls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play().catch(e => console.log("Autoplay blocked")));
+    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+        videoPlayer.src = proxiedStreamUrl;
+        videoPlayer.addEventListener('loadedmetadata', () => videoPlayer.play().catch(e => console.log("Autoplay blocked")));
+    }
+}
+
+
+        window.onload = () => {
+            if(CLOUDFLARE_PROXY.startsWith("YOUR_")) {
+                alert("দয়া করে কোডের ১৪৫ নম্বর লাইনে আপনার Cloudflare Worker লিঙ্কটি বসিয়ে দিন বন্ধু!");
+            } else {
+                fetchLiveDatabase();
+            }
+        };
+    </script>
+</body>
+</html>
