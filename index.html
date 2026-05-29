@@ -134,12 +134,8 @@
     </div>
 
     <script>
-        // ⚠️ গুরুত্বপূূর্ণ: নিচের লিঙ্কে 'YOUR_PROXY_URL_HERE' কেটে তোমার Cloudflare Worker-এর লিঙ্কটি বসিয়ে দাও
-        // উদাহরণ: const CLOUDFLARE_PROXY = "https://my-iptv-proxy.yourusername.workers.dev/?url=";
         const CLOUDFLARE_PROXY = "https://twilight-rice-ea5b.sohelrana12a12.workers.dev/?url=";
-
-        // গিটহাবের সেই রিয়েল-টাইম ডাটাবেজ সোর্স
-    const DATA_SOURCE = "https://iptv-org.github.io/iptv/index.m3u";
+        const DATA_SOURCE = "https://iptv-org.github.io/iptv/index.m3u";
 
         let allChannels = [];
         const videoPlayer = document.getElementById('videoPlayer');
@@ -147,7 +143,6 @@
 
         async function fetchLiveDatabase() {
             try {
-                // সরাসরি ক্লাউডফ্লেয়ার প্রক্সি দিয়ে ডাটা ফেচ করা হচ্ছে, তাই কোনো CORS এরর আসবে না
                 const response = await fetch(CLOUDFLARE_PROXY + encodeURIComponent(DATA_SOURCE));
                 const text = await response.text();
                 parseM3U(text);
@@ -208,7 +203,6 @@
             const grid = document.getElementById('channelGrid');
             grid.innerHTML = '';
 
-            // পারফরম্যান্স ধরে রাখতে প্রথম ১০০টি রেন্ডার হবে (Virtual DOM Concept)
             const sliceLimit = channelsToRender.slice(0, 100);
 
             sliceLimit.forEach((channel, index) => {
@@ -229,38 +223,43 @@
             });
         }
 
+        // 🛠️ ফুল-প্রুফ রি-রাইট ফাংশন (যা কখনো সাব-লিঙ্ক ইউআরএল ভাঙবে না)
         function playChannel(channel) {
-    document.getElementById('currentChannelName').innerText = "Playing: " + channel.name;
-    document.getElementById('liveBadge').style.display = 'inline-block';
+            document.getElementById('currentChannelName').innerText = "Playing: " + channel.name;
+            document.getElementById('liveBadge').style.display = 'inline-block';
 
-    if (currentHls) { currentHls.destroy(); }
+            if (currentHls) { currentHls.destroy(); }
 
-    const proxiedStreamUrl = CLOUDFLARE_PROXY + encodeURIComponent(channel.url);
+            const proxiedStreamUrl = CLOUDFLARE_PROXY + encodeURIComponent(channel.url);
 
-    if (Hls.isSupported()) {
-        // hls.js কনফিগারেশন আপডেট করা হচ্ছে যাতে সাব-লিঙ্কগুলোও প্রক্সি হয়ে যায়
-        currentHls = new Hls({
-            xhrSetup: function (xhr, url) {
-                // যদি ব্রাউজার সাব-লিঙ্ক লোড করার সময় আমাদের প্রক্সি লিঙ্ক ভুলে যায়
-                if (!url.startsWith(CLOUDFLARE_PROXY)) {
-                    const resolvedUrl = CLOUDFLARE_PROXY + encodeURIComponent(url);
-                    xhr.open('GET', resolvedUrl, true);
-                }
+            if (Hls.isSupported()) {
+                currentHls = new Hls({
+                    // এই প্রসেসটি সাব-লিঙ্কের বেস ইউআরএল ঠিক রেখে প্রক্সি অ্যাড্রেস জেনারেট করবে
+                    pLoader: function (config, context) {
+                        let originalXhr = new config.loader(config);
+                        this.load = function (context, config, callbacks) {
+                            let targetUrl = context.url;
+                            if (!targetUrl.startsWith(CLOUDFLARE_PROXY)) {
+                                context.url = CLOUDFLARE_PROXY + encodeURIComponent(targetUrl);
+                            }
+                            originalXhr.load(context, config, callbacks);
+                        };
+                        this.abort = function () { originalXhr.abort(); };
+                        this.destroy = function () { originalXhr.destroy(); };
+                    }
+                });
+                currentHls.loadSource(proxiedStreamUrl);
+                currentHls.attachMedia(videoPlayer);
+                currentHls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play().catch(e => console.log("Autoplay blocked")));
+            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                videoPlayer.src = proxiedStreamUrl;
+                videoPlayer.addEventListener('loadedmetadata', () => videoPlayer.play().catch(e => console.log("Autoplay blocked")));
             }
-        });
-        currentHls.loadSource(proxiedStreamUrl);
-        currentHls.attachMedia(videoPlayer);
-        currentHls.on(Hls.Events.MANIFEST_PARSED, () => videoPlayer.play().catch(e => console.log("Autoplay blocked")));
-    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-        videoPlayer.src = proxiedStreamUrl;
-        videoPlayer.addEventListener('loadedmetadata', () => videoPlayer.play().catch(e => console.log("Autoplay blocked")));
-    }
-}
-
+        }
 
         window.onload = () => {
             if(CLOUDFLARE_PROXY.startsWith("YOUR_")) {
-                alert("দয়া করে কোডের ১৪৫ নম্বর লাইনে আপনার Cloudflare Worker লিঙ্কটি বসিয়ে দিন বন্ধু!");
+                alert("দয়া করে কোডটি ঠিক করুন বন্ধু!");
             } else {
                 fetchLiveDatabase();
             }
