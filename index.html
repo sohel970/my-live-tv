@@ -37,9 +37,6 @@
             min-height: 100vh;
         }
 
-        /* -----------------------------------------
-           VIDEO PLAYER CONTAINER & LAX LOADER
-        -------------------------------------------- */
         .player-container {
             max-width: 950px;
             margin: 10px auto;
@@ -93,7 +90,6 @@
         .fit-mode video { object-fit: contain !important; }
         .stretch-mode video { object-fit: fill !important; width: 100vw !important; height: 100vh !important; }
 
-        /* 🔄 প্রিমিয়াম গ্লোয়িং লোডার স্টাইল */
         .premium-loader-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -131,7 +127,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Controls Layer */
         .player-controls-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -185,7 +180,6 @@
         .progress-container { flex: 1; display: flex; align-items: center; }
         .live-badge { background: #ff0055; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; }
 
-        /* Gesture Tracker */
         .gesture-detector-box {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -194,7 +188,6 @@
         }
         .gesture-side { width: 50%; height: 100%; }
 
-        /* OSD Configuration */
         .gesture-osd {
             position: absolute;
             top: 50%;
@@ -227,7 +220,6 @@
         #brightnessOSD { left: 20px; }
         #volumeOSD { right: 20px; }
 
-        /* Settings System */
         .settings-overlay {
             position: absolute;
             top: 50px; right: 15px;
@@ -249,9 +241,6 @@
         .quality-select-inline { background: transparent; color: #fff; border: none; outline: none; font-size: 12px; font-weight: 600; cursor: pointer; }
         .quality-select-inline option { background: #000; }
 
-        /* -----------------------------------------
-           🚀 অ্যাডভান্সড ৩-কলাম গ্রিড ও লাক্সারি থিম
-        -------------------------------------------- */
         .landing-header {
             background: #000000;
             padding: 20px 15px;
@@ -317,7 +306,6 @@
             border-radius: 2px;
         }
 
-        /* ৩-কলাম ফিক্সড গ্রিড স্ট্রাকচার (ডানপাশের ব্ল্যাক বক্স ফিক্সড) */
         .channels-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -325,15 +313,13 @@
             width: 100%;
         }
 
-        /* রেসপনসিভ লার্জ স্ক্রিন লেআউট */
         @media (min-width: 600px) { .channels-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 14px; } }
         @media (min-width: 900px) { .channels-grid { grid-template-columns: repeat(6, 1fr) !important; gap: 16px; } }
 
-        /* 🚀 অবিকল স্ক্রিনশটের মতো প্রিমিয়াম ম্যাজেন্টা নিয়োন বর্ডারলাইন কার্ড */
         .channel-card {
             background: #000000;
-            border: 2px solid var(--accent-magenta); /* অলওয়েজ প্রিমিয়াম পিঙ্ক বর্ডার */
-            border-radius: 22px; 
+            border: 2px solid var(--accent-magenta); 
+            border-radius: 22px;
             padding: 16px 8px;
             display: flex;
             flex-direction: column;
@@ -372,9 +358,8 @@
             display: block;
         }
 
-        /* 🚀 ছোট স্ক্রিনে লেখা স্বয়ংক্রিয়ভাবে ছোট করার ফিক্স */
         .card-name {
-            font-size: 10px; /* মোবাইল স্ক্রিনের জন্য নিখুঁত টাইটেল সাইজ */
+            font-size: 10px;
             font-weight: 700;
             color: #ffffff;
             text-align: center;
@@ -386,7 +371,6 @@
             letter-spacing: 0.2px;
         }
 
-        /* ট্যাবলেট বা ডেস্কটপে ফন্ট সাইজ সামান্য ইনক্রিজ হবে */
         @media (min-width: 600px) {
             .card-name { font-size: 12px; }
             .logo-wrap { width: 68px; height: 68px; }
@@ -429,7 +413,7 @@
                 <div class="osd-track"><div class="osd-fill" id="brightFill"></div></div>
                 <i class="fa-solid fa-sun"></i>
             </div>
-            
+          
             <div class="gesture-osd" id="volumeOSD">
                 <span class="osd-val-text" id="volText">100%</span>
                 <div class="osd-track"><div class="osd-fill" id="volFill"></div></div>
@@ -499,13 +483,13 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <script>
-        const playlistM3uUrl = "Skym3u-176.m3u";
-        let parsedChannels = ];
+        playlistM3uUrl = "https://raw.githubusercontent.com/sohel970/my-live-tv/refs/heads/main/Skym3u-176.m3u?v=" + Date.now();
+        
+        let parsedChannels = [];
         let activeSelectedChannel = null;
         let hlsInstance = null;
         const videoElement = document.getElementById('mainVideoPlayer');
         const loaderLayer = document.getElementById('streamLoader');
-
         let controlsTimer = null;
         let isPanelActive = true;
 
@@ -519,7 +503,6 @@
             setupGestureListeners();
             setupPanelAutoHideTrigger();
             
-            // ভিডিও প্লে স্ট্যাটাস ট্র্যাক করে লোডার অফ করার ইভেন্ট
             videoElement.addEventListener('playing', () => { loaderLayer.style.display = 'none'; });
             videoElement.addEventListener('waiting', () => { loaderLayer.style.display = 'flex'; });
         });
@@ -615,23 +598,38 @@
                 const res = await fetch(playlistM3uUrl);
                 const text = await res.text();
                 parseM3u(text);
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("ফাইল লোড করতে সমস্যা:", e); }
         }
 
         function parseM3u(text) {
             const lines = text.split('\n');
             let currentObj = {};
+            parsedChannels = []; 
+
             for(let i=0; i<lines.length; i++) {
                 let line = lines[i].trim();
+                if(!line) continue;
+
                 if(line.startsWith("#EXTINF:")) {
                     currentObj = {};
-                    let nameMatch = line.match(/,(.+)$/);
-                    if(nameMatch) currentObj.name = nameMatch[1].trim();
+                    
+                    let nameMatch = line.match(/,\s*(.+)$/);
+                    if(nameMatch) {
+                        let rawName = nameMatch[1].trim().replace(/\r/g, "");
+                        currentObj.name = rawName;
+                        
+                        // 🚀 অটোমেটিক লোগো জেনারেটর (নাম থেকে ফালতু স্পেস/লেখা বাদ দিয়ে আইডি তৈরি)
+                        let logoId = rawName.toLowerCase()
+                                            .replace(/\s+/g, '')
+                                            .replace(/hd|sd|tv|bd|sports|movies|bangla/g, '');
+                        currentObj.autoLogo = `https://iptv-org.github.io/logos/channels/${logoId}.png`;
+                    }
+                    
                     let logoMatch = line.match(/tvg-logo="([^"]+)"/);
                     if(logoMatch) currentObj.logo = logoMatch[1];
                 } else if(line.startsWith("http")) {
                     if(!currentObj.name) continue;
-                    currentObj.url = line;
+                    currentObj.url = line.replace(/\r/g, ""); 
                     parsedChannels.push(currentObj);
                     currentObj = {};
                 }
@@ -642,12 +640,23 @@
         function renderGrid(list) {
             const grid = document.getElementById('uiChannelsGrid');
             grid.innerHTML = "";
+            if(list.length === 0) {
+                grid.innerHTML = "<p style='color:#ccc; text-align:center; grid-column: 1/-1; padding:20px;'>কোনো চ্যানেল খুঁজে পাওয়া যায়নি!</p>";
+                return;
+            }
             list.forEach(chan => {
                 const card = document.createElement('div');
                 card.className = 'channel-card';
-                let logoImg = chan.logo ? `<img src="${chan.logo}" onerror="this.src='https://via.placeholder.com/60?text=TV'">` : `<img src="https://via.placeholder.com/60?text=TV">`;
+                
+                // ১. যদি .m3u ফাইলে অলরেডি থাকে তবে সেটা, না হলে আমাদের জেনারেট করা অটো-লিংক নিবে
+                let logoUrl = chan.logo || chan.autoLogo;
+                
+                // ২. লোগো ইমেজ বা অল্টারনেটিভ প্রফেশনাল গ্লোয়িং টিভি আইকন মেকানিজম
+                let logoImg = `<img src="${logoUrl}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                               <i class="fa-solid fa-tv" style="display:none; font-size: 24px; color: #ff2a74;"></i>`;
+                
                 card.innerHTML = `
-                    <div class="logo-wrap">${logoImg}</div>
+                    <div class="logo-wrap" style="display:flex; align-items:center; justify-content:center;">${logoImg}</div>
                     <div class="card-name">${chan.name}</div>
                 `;
                 card.onclick = () => launchPlayer(chan);
@@ -657,13 +666,16 @@
 
         function launchPlayer(channel) {
             activeSelectedChannel = channel;
-            
-            // 🔄 লোডার স্কিমা শো
             loaderLayer.style.display = 'flex';
             
             document.getElementById('playerContainer').style.display = 'block';
             document.getElementById('playerTitle').innerText = channel.name;
-            document.getElementById('playerLogo').src = channel.logo || 'https://via.placeholder.com/30?text=TV';
+            
+            // প্লেয়ারের ভেতরের টপ লোগো সেট করার কন্ডিশন
+            let logoUrl = channel.logo || channel.autoLogo;
+            const pLogo = document.getElementById('playerLogo');
+            pLogo.src = logoUrl;
+            pLogo.onerror = () => { pLogo.src = 'https://via.placeholder.com/30?text=TV'; };
             
             window.scrollTo({top: document.getElementById('playerContainer').offsetTop - 10, behavior: 'smooth'});
             loadStreamSource(channel.url);
@@ -782,7 +794,7 @@
 
         function switchServer(srvNum) {
             if(!activeSelectedChannel) return;
-            loaderLayer.style.display = 'flex'; // সার্ভার সুইচে লোডার রান
+            loaderLayer.style.display = 'flex'; 
             document.querySelectorAll('.srv-btn').forEach((btn, i) => {
                 btn.classList.toggle('active', i === (srvNum - 1));
             });
